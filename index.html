@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<title>MIDI Web Audio Wavetable Synth</title>
+
+	<!-- Set up Jazz MIDI plugin and MIDI callback -->
+	<script type="text/javascript" src="jazz.js"></script>
+	<script type="text/javascript" src="synth.js"></script>
+
+	<style>
+	body { background-color: #999999; overflow: hidden;}
+	#draw { height: 500px; }
+	</style>
+</head>
+
+<body>
+	<p>
+		MIDI Input:
+		<select id=midiIn onchange='changeMidi();'>
+			<option value="">Not connected</option>
+		</select>
+	</p>
+</body>
+</html>
