@@ -1,0 +1,19 @@
+application: midi-synth
+version: 1
+runtime: python27
+api_version: 1
+threadsafe: yes
+
+handlers:
+- url: /
+  static_files: index.html
+  upload: index\.html
+
+- url: /js
+  static_dir: js
+
+- url: /theme
+  static_dir: theme
+
+- url: /images
+  static_dir: images
