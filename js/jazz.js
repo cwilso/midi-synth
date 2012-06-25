@@ -19,9 +19,9 @@ function midiProc(t,a,b,c) {
     noteOff(b);
   } else if (cmd == 9) {
     // note on
-    noteOn(b);
+    noteOn(b, c/127);
   } else if (cmd == 11) {
-    controller(b, c);
+    controller(b, c/127);
   }
 }
 
