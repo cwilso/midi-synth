@@ -3,18 +3,87 @@
 <head>
 	<meta charset="utf-8" />
 	<title>MIDI Web Audio Wavetable Synth</title>
+	<link href='http://fonts.googleapis.com/css?family=Syncopate:400,700' rel='stylesheet' type='text/css'>
 
 	<!-- Set up Jazz MIDI plugin and MIDI callback -->
 	<script type="text/javascript" src="js/jazz.js"></script>
+	<script type="text/javascript" src="js/jquery-1.8.1.min.js"></script>
+	<script type="text/javascript" src="js/jQuery.knob.js"></script>
 	<script type="text/javascript" src="js/synth.js"></script>
+        <script>
+            $(function() {
+
+                $(".knob").knob({
+                    /*change : function (value) {
+                        //console.log("change : " + value);
+                    },
+                    release : function (value) {
+                        console.log("release : " + value);
+                    },
+                    cancel : function () {
+                        console.log("cancel : " + this.value);
+                    },
+                    draw : function () {
+
+                        // "tron" case
+                        if(this.$.data('skin') == 'tron') {
+
+                            var a = this.angle(this.cv)  // Angle
+                                , sa = this.startAngle          // Previous start angle
+                                , sat = this.startAngle         // Start angle
+                                , ea                            // Previous end angle
+                                , eat = sat + a                 // End angle
+                                , r = 1;
+
+                            this.g.lineWidth = this.lineWidth;
+
+                            this.o.cursor
+                                && (sat = eat - 0.3)
+                                && (eat = eat + 0.3);
+
+                            if (this.o.displayPrevious) {
+                                ea = this.startAngle + this.angle(this.v);
+                                this.o.cursor
+                                    && (sa = ea - 0.3)
+                                    && (ea = ea + 0.3);
+                                this.g.beginPath();
+                                this.g.strokeStyle = this.pColor;
+                                this.g.arc(this.xy, this.xy, this.radius - this.lineWidth, sa, ea, false);
+                                this.g.stroke();
+                            }
+
+                            this.g.beginPath();
+                            this.g.strokeStyle = r ? this.o.fgColor : this.fgColor ;
+                            this.g.arc(this.xy, this.xy, this.radius - this.lineWidth, sat, eat, false);
+                            this.g.stroke();
+
+                            this.g.lineWidth = 2;
+                            this.g.beginPath();
+                            this.g.strokeStyle = this.o.fgColor;
+                            this.g.arc( this.xy, this.xy, this.radius - this.lineWidth + 1 + this.lineWidth * 2 / 3, 0, 2 * Math.PI, false);
+                            this.g.stroke();
+
+                            return false;
+                        }
+                    }*/
+                });
+            });
+        </script>
 
 	<style>
-	body { background-color: #999999; overflow: hidden;}
+	body { background-color: #999999; overflow: hidden; font: 12px 'Syncopate', sans-serif;}
 	#draw { height: 500px; }
 	</style>
 </head>
 
 <body>
+    <div style="position:relative; width: 1000px; height: 400px; background: #222222; border: 3px solid #AAA; border-radius: 10px">
+        <div style="position:absolute; left: 100px; top: 100px; width: 100px; height:100px; overflow: visible">
+            <input class="knob" data-width=100 data-angleOffset=-125 data-angleArc=250 data-fgColor="#66EE66" value="35">
+            <div style="position:absolute; font-weight: bold; left: 0px; top: 85px; width:100px; text-align: center; color: white">frequency</div>
+        </div>
+    </div>
+
 	<p>
 		MIDI Input:
 		<select id=midiIn onchange='changeMidi();'>
