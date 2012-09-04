@@ -6,6 +6,29 @@ var ATTACKTIME = 0.01;
 var RELEASETIME = 1;
 var currentFilterFrequency = 2500;
 var currentFilterQ = 10;
+var keys = new Array( 256 );
+
+keys[65] = 60; // = C4
+keys[87] = 61;
+keys[83] = 62;
+keys[69] = 63;
+keys[68] = 64;
+keys[70] = 65; // = F4
+keys[84] = 66;
+keys[71] = 67;
+keys[89] = 68;
+keys[72] = 69;
+keys[85] = 70;
+keys[74] = 71;
+keys[75] = 72; // = C5
+keys[79] = 73;
+keys[76] = 74;
+keys[80] = 75;
+keys[186] = 76;
+keys[222] = 77; // = F5
+keys[221] = 78;
+keys[13] = 79;
+keys[220] = 80;
 
 function frequencyFromNoteNumber( note ) {
 	return 440 * Math.pow(2,(note-69)/12);
@@ -110,4 +133,22 @@ function initAudio() {
   	}
 }
 
+function keyDown( ev ) {
+	var note = keys[ev.keyCode];
+	if (note)
+		noteOn( note, 0.75 );
+//	console.log( "key down: " + ev.keyCode );
+	return false;
+}
+
+function keyUp( ev ) {
+	var note = keys[ev.keyCode];
+	if (note)
+		noteOff( note );
+//	console.log( "key up: " + ev.keyCode );
+	return false;
+}
+
 window.onload=initAudio;
+window.addEventListener('keydown', keyDown, false);
+window.addEventListener('keyup', keyUp, false);
