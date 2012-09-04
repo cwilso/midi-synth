@@ -5,8 +5,10 @@
 	<title>MIDI Web Audio Wavetable Synth</title>
 	<link href='http://fonts.googleapis.com/css?family=Syncopate:400,700' rel='stylesheet' type='text/css'>
 
-	<!-- Set up Jazz MIDI plugin and MIDI callback -->
-	<script type="text/javascript" src="js/jazz.js"></script>
+	<!-- Set up Web MIDI polyfill -->
+    <script type="text/javascript" src="lib/WebMIDIAPI.js"></script>
+
+    <script type="text/javascript" src="js/midi.js"></script>
 	<script type="text/javascript" src="js/jquery-1.8.1.min.js"></script>
 	<script type="text/javascript" src="js/jQuery.knob.js"></script>
 	<script type="text/javascript" src="js/synth.js"></script>
@@ -73,11 +75,16 @@
 	<style>
 	body { background-color: #999999; overflow: hidden; font: 12px 'Syncopate', sans-serif;}
 	#draw { height: 500px; }
+    #synthbox { 
+        position:relative; width: 1000px; height: 400px; background: #222222; border: 3px solid #AAA; border-radius: 10px}
+    .loaded#synthbox { border-color: green;}
+    .error#synthbox { border-color: red;}
+
 	</style>
 </head>
 
 <body>
-    <div style="position:relative; width: 1000px; height: 400px; background: #222222; border: 3px solid #AAA; border-radius: 10px">
+    <div id="synthbox">
         <div style="position:absolute; left: 100px; top: 100px; width: 100px; height:100px; overflow: visible">
             <input class="knob" data-width=100 data-angleOffset=-125 data-angleArc=250 data-fgColor="#66EE66" value="35">
             <div style="position:absolute; font-weight: bold; left: 0px; top: 85px; width:100px; text-align: center; color: white">frequency</div>
@@ -87,7 +94,7 @@
 	<p>
 		MIDI Input:
 		<select id=midiIn onchange='changeMidi();'>
-			<option value="">Not connected</option>
+			<option value="">Still loading MIDI system...</option>
 		</select>
 	</p>
 </body>
