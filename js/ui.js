@@ -1,4 +1,4 @@
-function createKnob( label, x, y, min, max, currentValue, color, onChange ) {
+function createKnob( label, width, x, y, min, max, currentValue, color, onChange ) {
 	var container = document.createElement( "div" );
 	container.className = "knobContainer";
 	container.style.left = "" + x + "px";
@@ -9,7 +9,7 @@ function createKnob( label, x, y, min, max, currentValue, color, onChange ) {
 	knob.value = currentValue;
 	knob.setAttribute( "data-min", min );
 	knob.setAttribute( "data-max", max );
-	knob.setAttribute( "data-width", "100" );
+	knob.setAttribute( "data-width", width );
 	knob.setAttribute( "data-angleOffset", "-125" );
 	knob.setAttribute( "data-angleArc", "250" );
 	knob.setAttribute( "data-fgColor", color );
@@ -18,6 +18,8 @@ function createKnob( label, x, y, min, max, currentValue, color, onChange ) {
 
 	var labelText = document.createElement( "div" );
 	labelText.className = "knobLabel";
+	labelText.style.top = "" + (width* 0.85) + "px";
+	labelText.style.width = "" + width + "px";
 	labelText.appendChild( document.createTextNode( label ) );
 
 	container.appendChild( labelText );
@@ -63,46 +65,46 @@ function createSection( label, x, y, width, height ) {
 }
 
 function setupSynthUI() {
-	var osc1 = createSection( "OSC1", 10, 10, 240, 160 );	
+	var osc1 = createSection( "OSC1", 130, 10, 240, 160 );	
 	osc1.appendChild( createDropdown( "waveform", 10, 15, ["sine","square", "saw", "triangle", "wavetable"], 0, null ))
 	osc1.appendChild( createDropdown( "interval", 160, 15, ["32'","16'", "8'"], 0, null ) );
-	osc1.appendChild( createKnob( "detune", 10, 65, -1200, 1200, 0, "blue", null ) );
-	osc1.appendChild( createKnob( "mix", 130, 65, 0, 100, 75, "blue", null ) );
+	osc1.appendChild( createKnob( "detune", 100, 10, 65, -1200, 1200, 0, "blue", null ) );
+	osc1.appendChild( createKnob( "mix", 100, 130, 65, 0, 100, 75, "blue", null ) );
 	synthBox.appendChild( osc1 );
 
-	var osc2 = createSection( "OSC2", 10, 193, 240, 160 );	
+	var osc2 = createSection( "OSC2", 130, 192, 240, 160 );	
 	osc2.appendChild( createDropdown( "waveform", 10, 15, ["sine","square", "saw", "triangle", "wavetable"], 0, null ))
 	osc2.appendChild( createDropdown( "interval", 160, 15, ["16'","8'", "4'"], 0, null ) );
-	osc2.appendChild( createKnob( "detune", 10, 65, -500, 500, 0, "blue", null ) );
-	osc2.appendChild( createKnob( "mix", 130, 65, 0, 100, 75, "blue", null ) );
+	osc2.appendChild( createKnob( "detune", 100, 10, 65, -500, 500, 0, "blue", null ) );
+	osc2.appendChild( createKnob( "mix", 100, 130, 65, 0, 100, 75, "blue", null ) );
 	synthBox.appendChild( osc2 );
 
-	var mod = createSection( "MOD", 282, 10, 100, 342 );	
-	mod.appendChild( createDropdown( "waveform", 10, 15, ["sine","square", "saw", "triangle"], 0, null ))
-	mod.appendChild( createKnob( "frequency", 10, 60, 0, 20, 2, "blue", null ) );
-	mod.appendChild( createKnob( "depth1", 10, 165, 0, 100, 75, "blue", null ) );
-	mod.appendChild( createKnob( "depth2", 10, 245, 0, 100, 75, "blue", null ) );
+	var mod = createSection( "freq mod", 10, 10, 87, 342 );	
+	mod.appendChild( createDropdown( "shape", 12, 15, ["sine","square", "saw", "triangle"], 0, null ))
+	mod.appendChild( createKnob( "freq", 80, 12, 65, 0, 20, 2, "blue", null ) );
+	mod.appendChild( createKnob( "depth1", 80, 12, 160, 0, 100, 75, "blue", null ) );
+	mod.appendChild( createKnob( "depth2", 80, 12, 255, 0, 100, 75, "blue", null ) );
 	synthBox.appendChild( mod );
 
-	var filter = createSection( "FILTER", 414, 10, 100, 342 );	
-	filter.appendChild( createDropdown( "waveform", 10, 15, ["sine","square", "saw", "triangle"], 0, null ))
-	filter.appendChild( createKnob( "frequency", 10, 60, 0, 20, 2, "blue", null ) );
-	filter.appendChild( createKnob( "depth1", 10, 165, 0, 100, 75, "blue", null ) );
-	filter.appendChild( createKnob( "depth2", 10, 245, 0, 100, 75, "blue", null ) );
+	var filter = createSection( "filter", 404, 10, 100, 342 );	
+	filter.appendChild( createDropdown( "waveform", 12, 15, ["sine","square", "saw", "triangle"], 0, null ))
+	filter.appendChild( createKnob( "freq", 80, 12, 65, 0, 5000, 1000, "blue", null ) );
+	filter.appendChild( createKnob( "q", 80, 12, 160, 0, 100, 75, "blue", null ) );
+	filter.appendChild( createKnob( "mod", 80, 12, 255, 0, 100, 75, "blue", null ) );
 	synthBox.appendChild( filter );
 
-	var filterEnv = createSection( "filter envelope", 546, 10, 240, 160 );	
-	filterEnv.appendChild( createDropdown( "waveform", 10, 15, ["sine","square", "saw", "triangle", "wavetable"], 0, null ))
-	filterEnv.appendChild( createDropdown( "interval", 160, 15, ["32'","16'", "8'"], 0, null ) );
-	filterEnv.appendChild( createKnob( "detune", 10, 65, -1200, 1200, 0, "blue", null ) );
-	filterEnv.appendChild( createKnob( "mix", 130, 65, 0, 100, 75, "blue", null ) );
+	var filterEnv = createSection( "filter envelope", 538, 10, 355, 100 );	
+	filterEnv.appendChild( createKnob( "attack",  80,   10, 20, 0, 100, 50, "blue", null ) );
+	filterEnv.appendChild( createKnob( "decay",   80,  100, 20, 0, 100, 50, "blue", null ) );
+	filterEnv.appendChild( createKnob( "sustain", 80,  190, 20, 0, 100, 50, "blue", null ) );
+	filterEnv.appendChild( createKnob( "release", 80,  280, 20, 0, 100, 50, "blue", null ) );
 	synthBox.appendChild( filterEnv );
 
-	var volumeEnv = createSection( "volume envelope", 546, 193, 240, 160 );	
-	volumeEnv.appendChild( createDropdown( "waveform", 10, 15, ["sine","square", "saw", "triangle", "wavetable"], 0, null ))
-	volumeEnv.appendChild( createDropdown( "interval", 160, 15, ["16'","8'", "4'"], 0, null ) );
-	volumeEnv.appendChild( createKnob( "detune", 10, 65, -500, 500, 0, "blue", null ) );
-	volumeEnv.appendChild( createKnob( "mix", 130, 65, 0, 100, 75, "blue", null ) );
+	var volumeEnv = createSection( "volume envelope", 538, 135, 355, 100 );	
+	volumeEnv.appendChild( createKnob( "attack",  80,   10, 20, 0, 100, 50, "blue", null ) );
+	volumeEnv.appendChild( createKnob( "decay",   80,  100, 20, 0, 100, 50, "blue", null ) );
+	volumeEnv.appendChild( createKnob( "sustain", 80,  190, 20, 0, 100, 50, "blue", null ) );
+	volumeEnv.appendChild( createKnob( "release", 80,  280, 20, 0, 100, 50, "blue", null ) );
 	synthBox.appendChild( volumeEnv );
 
 
