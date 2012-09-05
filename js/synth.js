@@ -6,8 +6,8 @@ var ATTACKTIME = 0.01;
 var RELEASETIME = 1;
 var currentFilterFrequency = 2500;
 var currentFilterQ = 10;
+var synthBox = null;
 var keys = new Array( 256 );
-
 keys[65] = 60; // = C4
 keys[87] = 61;
 keys[83] = 62;
@@ -124,15 +124,6 @@ Voice.prototype.noteOff = function() {
 	this.osc.noteOff( now + RELEASETIME );
 }
 
-function initAudio() {
-	try {
-    	audioContext = new webkitAudioContext();
-  	}
-  	catch(e) {
-    	alert('Web Audio API is not supported in this browser');
-  	}
-}
-
 function keyDown( ev ) {
 	var note = keys[ev.keyCode];
 	if (note)
@@ -149,6 +140,17 @@ function keyUp( ev ) {
 	return false;
 }
 
+function initAudio() {
+	try {
+    	audioContext = new webkitAudioContext();
+  	}
+  	catch(e) {
+    	alert('Web Audio API is not supported in this browser');
+  	}
+	window.addEventListener('keydown', keyDown, false);
+	window.addEventListener('keyup', keyUp, false);
+	synthBox = document.getElementById("synthbox");
+	setupSynthUI();
+}
+
 window.onload=initAudio;
-window.addEventListener('keydown', keyDown, false);
-window.addEventListener('keyup', keyUp, false);

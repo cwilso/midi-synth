@@ -1,8 +1,3 @@
-var active_element;
-var current_in;
-var msg;
-var sel;
-
 function midiMessageReceived( msgs ) {
   for (i=0; i<msgs.length; i++) {
     var cmd = msgs[i].data[0] >> 4;
@@ -22,38 +17,6 @@ function midiMessageReceived( msgs ) {
   }
 }
 
-//// Listbox
-function changeMidi(){
- try{
-  if(sel.selectedIndex){
-   current_in=Jazz.MidiInOpen(sel.options[sel.selectedIndex].value,midiProc);
-  } else {
-   Jazz.MidiInClose(); current_in='';
-  }
-  for(var i=0;i<sel.length;i++){
-   if(sel[i].value==current_in) sel[i].selected=1;
-  }
- }
- catch(err){}
-}
-
-//// Connect/disconnect
-function connectMidiIn(){
- try{
-  var str=Jazz.MidiInOpen(current_in,midiProc);
-  for(var i=0;i<sel.length;i++){
-   if(sel[i].value==str) sel[i].selected=1;
-  }
- }
- catch(err){}
-}
-function disconnectMidiIn(){
- try{
-  Jazz.MidiInClose(); sel[0].selected=1;
- }
- catch(err){}
-}
-
 var selectMIDI = null;
 var midiAccess = null;
 var midiIn = null;
@@ -62,6 +25,16 @@ function changeMIDIPort() {
   var list=midiAccess.enumerateInputs();
   midiIn = midi.getInput( list[ selectMIDI.selectedIndex ] );
   midiIn.onmessage = midiMessageReceived;
+}
+
+function selectMIDIIn( ev ) {
+  var list=midi.enumerateInputs();
+  var selectedIndex = ev.target.selectedIndex;
+
+  if (list.length >= selectedIndex) {
+    midiIn = midi.getInput( list[selectedIndex] );
+    midiIn.onmessage = midiMessageReceived;
+  }
 }
 
 function onMIDIStarted( midi ) {
@@ -81,6 +54,8 @@ function onMIDIStarted( midi ) {
     }
     midiIn = midi.getInput( list[0] );
     midiIn.onmessage = midiMessageReceived;
+
+    selectMIDI.onchange = selectMIDIIn;
   }
 }
 
