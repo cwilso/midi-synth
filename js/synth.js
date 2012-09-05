@@ -50,6 +50,10 @@ function noteOff( note ) {
 
 }
 
+function onUpdateFilterFrequency() {
+
+}
+
 function controller( number, value ) {
 	if (number == 1)
 		currentFilterFrequency = 5000 * value;

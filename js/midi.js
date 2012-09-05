@@ -13,7 +13,7 @@ function midiMessageReceived( msgs ) {
       noteOn( noteNumber, velocity/127.0);
     } else if (cmd == 11) {
       controller( noteNumber, velocity/127.0);
-    }
+    }   
   }
 }
 
