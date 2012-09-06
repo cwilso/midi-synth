@@ -2,10 +2,12 @@ var voices = new Array();
 var audioContext = null;
 var FOURIER_SIZE = 4096;
 var wave = false;
-var ATTACKTIME = 0.01;
-var RELEASETIME = 1;
+var ATTACKTIME = 0.1;
+var RELEASETIME = 0.5;
 var currentFilterFrequency = 2500;
 var currentFilterQ = 10;
+var currentOsc1Waveform = 0; // SINE
+
 var synthBox = null;
 var keys = new Array( 256 );
 keys[65] = 60; // = C4
@@ -50,10 +52,24 @@ function noteOff( note ) {
 
 }
 
+// 'value' is normalized to 0..1.
+function controller( number, value ) {
+  if (number == 1) {
+    currentFilterFrequency = 5000 * value;
+    $("#fFreq input").val( currentFilterFrequency );
+    $("#fFreq input").trigger('change');
+    return;
+  } else if (number == 2) {
+    currentFilterQ = 40 * value;
+    $("#fQ input").val( currentFilterFrequency );
+    $("#fQ input").trigger('change');
+  }
+}
+
 function onUpdateFilterFrequency( value ) {
 	if (value.currentTarget)
 		value = value.currentTarget.value;
-	console.log("update Filter Freq: " + value);
+//	console.log("update Filter Freq: " + value);
 	for (var i=0; i<255; i++) {
 		if (voices[i] != null) {
 			voices[i].setFilterFrequency( value );
@@ -61,20 +77,22 @@ function onUpdateFilterFrequency( value ) {
 	}
 }
 
-function controller( number, value ) {
-	if (number == 1) {
-		currentFilterFrequency = 5000 * value;
-		$("#ffreq input").val( currentFilterFrequency );
-    	$("#ffreq input").trigger('change');
-		return;
-	} else if (number == 2)
-	  	currentFilterQ = 20 * value;
+function onUpdateFilterQ( value ) {
+	if (value.currentTarget)
+		value = value.currentTarget.value;
+//	console.log("update Filter Q: " + value);
 	for (var i=0; i<255; i++) {
 		if (voices[i] != null) {
-			if (number == 1)
-				voices[i].setFilterFrequency(value * 5000);
-			else if (number == 2)
-				voices[i].setFilterQ(value);
+			voices[i].setFilterQ( value );
+		}
+	}
+}
+
+function onUpdateOsc1Wave( ev ) {
+	currentOsc1Waveform = ev.target.selectedIndex;
+	for (var i=0; i<255; i++) {
+		if (voices[i] != null) {
+			voices[i].setOsc1Waveform( currentOsc1Waveform );
 		}
 	}
 }
@@ -99,7 +117,7 @@ function controller( number, value ) {
 function Voice( note, velocity ) {
 	this.osc = audioContext.createOscillator();
 	this.osc.frequency.value = frequencyFromNoteNumber( note );
-	this.osc.type = this.osc.TRIANGLE;
+	this.osc.type = currentOsc1Waveform;
 	this.envelope = audioContext.createGainNode();
 	this.gain = audioContext.createGainNode();
 	this.gain.gain.value = 0.05 + (0.33 * velocity);
@@ -117,18 +135,17 @@ function Voice( note, velocity ) {
 	this.osc.noteOn(0);
 }
 
-Voice.prototype.setFilterFrequency = function( value ) {
-	// value is 0-1; scale to 0-5000.
+Voice.prototype.setOsc1Waveform = function( value ) {
+	this.osc.type = value;
+}
 
-//	this.filter.frequency.setTargetValueAtTime( value * 5000, audioContext.currentTime, 0.1 );
+Voice.prototype.setFilterFrequency = function( value ) {
 	this.filter.frequency.value = value;
 }
 
 Voice.prototype.setFilterQ = function( value ) {
-	// value is 0-1; scale to 0-20.
-
-//	this.filter.Q.setTargetValueAtTime( value * 20, audioContext.currentTime, 0.1 );
-	this.filter.Q.value = value * 20;
+//	this.filter.Q.setTargetValueAtTime( value, audioContext.currentTime, 0.1 );
+	this.filter.Q.value = value;
 }
 
 Voice.prototype.noteOff = function() {
