@@ -50,19 +50,29 @@ function noteOff( note ) {
 
 }
 
-function onUpdateFilterFrequency() {
-
+function onUpdateFilterFrequency( value ) {
+	if (value.currentTarget)
+		value = value.currentTarget.value;
+	console.log("update Filter Freq: " + value);
+	for (var i=0; i<255; i++) {
+		if (voices[i] != null) {
+			voices[i].setFilterFrequency( value );
+		}
+	}
 }
 
 function controller( number, value ) {
-	if (number == 1)
+	if (number == 1) {
 		currentFilterFrequency = 5000 * value;
-	  else if (number == 2)
+		$("#ffreq input").val( currentFilterFrequency );
+    	$("#ffreq input").trigger('change');
+		return;
+	} else if (number == 2)
 	  	currentFilterQ = 20 * value;
 	for (var i=0; i<255; i++) {
 		if (voices[i] != null) {
 			if (number == 1)
-				voices[i].setFilterFrequency(value);
+				voices[i].setFilterFrequency(value * 5000);
 			else if (number == 2)
 				voices[i].setFilterQ(value);
 		}
@@ -111,7 +121,7 @@ Voice.prototype.setFilterFrequency = function( value ) {
 	// value is 0-1; scale to 0-5000.
 
 //	this.filter.frequency.setTargetValueAtTime( value * 5000, audioContext.currentTime, 0.1 );
-	this.filter.frequency.value = value * 5000;
+	this.filter.frequency.value = value;
 }
 
 Voice.prototype.setFilterQ = function( value ) {

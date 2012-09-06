@@ -13,7 +13,8 @@ function createKnob( label, width, x, y, min, max, currentValue, color, onChange
 	knob.setAttribute( "data-angleOffset", "-125" );
 	knob.setAttribute( "data-angleArc", "250" );
 	knob.setAttribute( "data-fgColor", color );
-	knob.oninput = onChange;
+	knob.onchange = onChange;
+
 	container.appendChild( knob );
 
 	var labelText = document.createElement( "div" );
@@ -23,6 +24,7 @@ function createKnob( label, width, x, y, min, max, currentValue, color, onChange
 	labelText.appendChild( document.createTextNode( label ) );
 
 	container.appendChild( labelText );
+
 	return container;
 }
 
@@ -87,11 +89,14 @@ function setupSynthUI() {
 	synthBox.appendChild( mod );
 
 	var filter = createSection( "filter", 404, 10, 100, 342 );	
-	filter.appendChild( createDropdown( "waveform", 12, 15, ["sine","square", "saw", "triangle"], 0, null ))
-	filter.appendChild( createKnob( "freq", 80, 12, 65, 0, 5000, 1000, "blue", null ) );
-	filter.appendChild( createKnob( "q", 80, 12, 160, 0, 100, 75, "blue", null ) );
-	filter.appendChild( createKnob( "mod", 80, 12, 255, 0, 100, 75, "blue", null ) );
+	var filterFreqKnob = createKnob( "freq", 85, 12, 65, 0, 5000, 1000, "blue", onUpdateFilterFrequency );
+	filterFreqKnob.id="ffreq";
+
+	filter.appendChild( filterFreqKnob );
+	filter.appendChild( createKnob( "q", 85, 12, 160, 0, 100, 75, "blue", null ) );
+	filter.appendChild( createKnob( "mod", 85, 12, 255, 0, 100, 75, "blue", null ) );
 	synthBox.appendChild( filter );
+//	$( filterFreqKnob ).knob({ 'change' : onUpdateFilterFrequency });
 
 	var filterEnv = createSection( "filter envelope", 538, 10, 355, 100 );	
 	filterEnv.appendChild( createKnob( "attack",  80,   10, 20, 0, 100, 50, "blue", null ) );
@@ -108,13 +113,11 @@ function setupSynthUI() {
 	synthBox.appendChild( volumeEnv );
 
 
-	$(".knob").knob();
+	$(".knob").knob({
+                    change : function (value) {
+//                        console.log("change : " + value);
+                        var e = this.$[0];
+                        if (e.onchange)
+                        	e.onchange(value);
+                    } });
 } 
-
-/*
-        <div class=knobContainer x y>
-            <input class="knob" data-width=100 data-angleOffset=-125 data-angleArc=250 
-            data-fgColor="#66EE66" value="35">
-            <div style="position:absolute; font-weight: bold; left: 0px; top: 85px; width:100px; text-align: center; color: white">frequency</div>
-        </div>
-*/
