@@ -11,7 +11,7 @@ var currentOsc2Octave = 1;  // 8'
 var currentOsc2Detune = 15;	// slight detune makes pretty analogue-y sound.  :)
 var currentOsc2Mix = 50.0;	// 0%
 
-var currentFilterFrequency = 1492.0;
+var currentFilterFrequency = 1500.0;
 var currentFilterQ = 5.0;
 var currentFilterMod = 0;
 var currentFilterEnv = 67;
@@ -28,7 +28,7 @@ var currentFilterEnvR = 40;
 
 var currentRev = 0;
 var currentDrive = 0;
-var currentVol = 50;
+var currentVol = 75;
 
 var keys = new Array( 256 );
 keys[65] = 60; // = C4 ("middle C")
@@ -57,6 +57,8 @@ var effectChain = null;
 var waveshaper = null;
 var volNode = null;
 var revNode = null;
+var revGain = null;
+var revBypassGain = null;
 
 function frequencyFromNoteNumber( note ) {
 	return 440 * Math.pow(2,(note-69)/12);
@@ -236,7 +238,22 @@ function onUpdateFilterEnvR( value ) {
 
 function onUpdateDrive( value ) {
 	currentDrive = value;
-    waveshaper.setDrive( 0.1 + currentDrive/50.0 );
+    waveshaper.setDrive( 0.1 + (currentDrive*currentDrive/50.0) );
+}
+
+function onUpdateVolume( value ) {
+	volNode.gain.value = value/100.0;
+}
+
+function onUpdateReverb( value ) {
+	value = value/100;
+
+	// equal-power crossfade
+	var gain1 = Math.cos(value * 0.5*Math.PI);
+	var gain2 = Math.cos((1.0-value) * 0.5*Math.PI);
+
+	revBypassGain.gain.value = gain1;
+	revGain.gain.value = gain2;
 }
 
 /*
@@ -268,7 +285,7 @@ function Voice( note, velocity ) {
 	this.osc1.type = currentOsc1Waveform;
 
 	this.osc1Gain = audioContext.createGainNode();
-	this.osc1Gain.gain.value = 0.0002 * currentOsc1Mix;
+	this.osc1Gain.gain.value = 0.005 * currentOsc1Mix;
 //	this.gain.gain.value = 0.05 + (0.33 * velocity);
 	this.osc1.connect( this.osc1Gain );
 
@@ -278,7 +295,7 @@ function Voice( note, velocity ) {
 	this.osc2.type = currentOsc2Waveform;
 
 	this.osc2Gain = audioContext.createGainNode();
-	this.osc2Gain.gain.value = 0.0002 * currentOsc2Mix;
+	this.osc2Gain.gain.value = 0.005 * currentOsc2Mix;
 	this.osc2.connect( this.osc2Gain );
 
 	this.filter1 = audioContext.createBiquadFilter();
@@ -387,6 +404,7 @@ function initAudio() {
   	catch(e) {
     	alert('Web Audio API is not supported in this browser');
   	}
+
 	window.addEventListener('keydown', keyDown, false);
 	window.addEventListener('keyup', keyUp, false);
 	setupSynthUI();
@@ -396,13 +414,31 @@ function initAudio() {
 	waveshaper = new WaveShaper( audioContext );
     effectChain.connect( waveshaper.input );
     onUpdateDrive( currentDrive );
-//    revNode = audioContext.createConvolutionNode();
+    revNode = audioContext.createConvolver();
+	revGain = audioContext.createGainNode();
+	revBypassGain = audioContext.createGainNode();
+
     volNode = audioContext.createGainNode();
     volNode.gain.value = currentVol;
-    waveshaper.output.connect( // revNode );
-    //revNode.connect( 
-    	volNode );
+    waveshaper.output.connect( revNode );
+    waveshaper.output.connect( revBypassGain );
+    revNode.connect( revGain );
+    revGain.connect( volNode );
+    revBypassGain.connect( volNode );
+    onUpdateReverb( currentRev );
+
     volNode.connect( audioContext.destination );
+    onUpdateVolume( currentVol );
+
+  	var irRRequest = new XMLHttpRequest();
+	irRRequest.open("GET", "sounds/irRoom.wav", true);
+	irRRequest.responseType = "arraybuffer";
+	irRRequest.onload = function() {
+  		audioContext.decodeAudioData( irRRequest.response, 
+  			function(buffer) { if (revNode) revNode.buffer = buffer; else console.log("no revNode ready!")} );
+	}
+	irRRequest.send();
+
 
 }
 
