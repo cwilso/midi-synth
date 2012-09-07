@@ -34,7 +34,7 @@ function createKnob( id, label, width, x, y, min, max, currentValue, color, onCh
 	return container;
 }
 
-function createDropdown( label, x, y, values, selectedIndex, onChange ) {
+function createDropdown( id, label, x, y, values, selectedIndex, onChange ) {
 	var container = document.createElement( "div" );
 	container.className = "dropdownContainer";
 	container.style.left = "" + x + "px";
@@ -46,7 +46,8 @@ function createDropdown( label, x, y, values, selectedIndex, onChange ) {
 	container.appendChild( labelText );
 
 	var select = document.createElement( "select" );
-	select.className = "dropdownSelect"
+	select.className = "dropdownSelect";
+	select.id = id;
 	for (var i=0; i<values.length; i++)
 		select.options[i] = new Option(values[i]);
 	select.selectedIndex = selectedIndex;
@@ -76,27 +77,22 @@ function setupSynthUI() {
 	synthBox = document.getElementById("synthbox");
 	
 	var mod = createSection( "mod", 10, 10, 87, 342 );
-
-	// mod is currently unimplemented
-	mod.style.borderColor = "#444";
-	mod.style.color = "gray";
-
-	mod.appendChild( createDropdown( "shape", 12, 15, ["sine","square", "saw", "triangle"], 0, null ))
-	mod.appendChild( createKnob( "mFreq", "freq*10", 80, 12, 65, 0, 200, 2, "#c10087", null ) );
-	mod.appendChild( createKnob( "mDepth1", "osc1 freq", 80, 12, 160, 0, 100, 75, "#c10087", null ) );
-	mod.appendChild( createKnob( "mDepth2", "osc2 freq", 80, 12, 255, 0, 100, 75, "#c10087", null ) );
+	mod.appendChild( createDropdown( "modwave", "shape", 12, 15, ["sine","square", "saw", "triangle"], currentModWaveform, onUpdateModWaveform ))
+	mod.appendChild( createKnob( "mFreq", "freq*10", 80, 12, 65, 0, 100, currentModFrequency, "#c10087", onUpdateModFrequency ) );
+	mod.appendChild( createKnob( "mDepth1", "osc1 tremolo", 80, 12, 160, 0, 100, currentModOsc1, "#c10087", onUpdateModOsc1 ) );
+	mod.appendChild( createKnob( "mDepth2", "osc2 tremolo", 80, 12, 255, 0, 100, currentModOsc2, "#c10087", onUpdateModOsc2 ) );
 	synthBox.appendChild( mod );
 
 	var osc1 = createSection( "OSC1", 130, 10, 240, 160 );	
-	osc1.appendChild( createDropdown( "waveform", 10, 15, ["sine","square", "saw", "triangle"/*, "wavetable"*/], currentOsc1Waveform, onUpdateOsc1Wave ))
-	osc1.appendChild( createDropdown( "interval",             160, 15, ["32'","16'", "8'"], currentOsc1Octave, onUpdateOsc1Octave ) );
+	osc1.appendChild( createDropdown( "osc1wave", "waveform", 10, 15, ["sine","square", "saw", "triangle"/*, "wavetable"*/], currentOsc1Waveform, onUpdateOsc1Wave ))
+	osc1.appendChild( createDropdown( "osc1int", "interval",             160, 15, ["32'","16'", "8'"], currentOsc1Octave, onUpdateOsc1Octave ) );
 	osc1.appendChild( createKnob(     "osc1detune", "detune", 100, 10, 65, -1200, 1200, currentOsc1Detune, "blue", onUpdateOsc1Detune ) );
 	osc1.appendChild( createKnob(     "osc1mix", "mix",       100, 130, 65, 0, 100, currentOsc1Mix, "blue", onUpdateOsc1Mix ) );
 	synthBox.appendChild( osc1 );
 
 	var osc2 = createSection( "OSC2", 130, 192, 240, 160 );	
-	osc2.appendChild( createDropdown( "waveform", 10, 15, ["sine","square", "saw", "triangle"/*, "wavetable"*/], currentOsc2Waveform, onUpdateOsc2Wave ))
-	osc2.appendChild( createDropdown( "interval", 160, 15, ["16'","8'", "4'"], currentOsc2Octave, onUpdateOsc2Octave ) );
+	osc2.appendChild( createDropdown( "osc2wave", "waveform", 10, 15, ["sine","square", "saw", "triangle"/*, "wavetable"*/], currentOsc2Waveform, onUpdateOsc2Wave ))
+	osc2.appendChild( createDropdown( "osc2int", "interval", 160, 15, ["16'","8'", "4'"], currentOsc2Octave, onUpdateOsc2Octave ) );
 	osc2.appendChild( createKnob( "osc2detune", "detune", 100, 10, 65, -1200, 1200, currentOsc2Detune, "blue", onUpdateOsc2Detune ) );
 	osc2.appendChild( createKnob( "osc2mix", "mix", 100, 130, 65, 0, 100, currentOsc2Mix, "blue", onUpdateOsc2Mix ) );
 	synthBox.appendChild( osc2 );
@@ -104,7 +100,7 @@ function setupSynthUI() {
 	var filter = createSection( "filter", 404, 10, 80, 342 );	
 	filter.appendChild( createKnob( "fFreq", "freq", 75, 12, 15, 0, 5000, currentFilterFrequency, "#ffaa00", onUpdateFilterFrequency ) );
 	filter.appendChild( createKnob( "fQ", "q",       75, 12, 100, 0, 20, currentFilterQ, "#ffaa00", onUpdateFilterQ ) );
-//	filter.appendChild( createKnob( "fMod", "mod",   75, 12, 185, 0, 100, currentFilterMod, "ffaa00", null ) );
+	filter.appendChild( createKnob( "fMod", "mod",   75, 12, 185, 0, 100, currentFilterMod, "#ffaa00", onUpdateFilterMod ) );
 	filter.appendChild( createKnob( "fEnv", "env",   75, 12, 270, 0, 100, currentFilterEnv, "#ffaa00", onUpdateFilterEnv ) );
 	synthBox.appendChild( filter );
 
@@ -126,8 +122,8 @@ function setupSynthUI() {
 	master.appendChild( createKnob( "drive", "drive",    80,   10, 20, 0, 100, currentDrive, "yellow", onUpdateDrive ) );
 	master.appendChild( createKnob( "rev", "reverb",     80,  100, 20, 0, 100, currentRev, "yellow", onUpdateReverb ) );
 	master.appendChild( createKnob( "vol", "volume",     80,  190, 20, 0, 100, currentVol, "yellow", onUpdateVolume ) );
-	master.appendChild( createDropdown( "midi_in", 280, 15, ["-none-","-", "-"], 0, null ) );
-	master.appendChild( createDropdown( "kbd_oct", 280, 60, ["-3", "-2","-1", "normal", "+1", "+2", "+3"], 3, null ) );
+	master.appendChild( createDropdown( "midiIn", "midi_in", 280, 15, ["-no MIDI-"], 0, changeMIDIPort ) );
+	master.appendChild( createDropdown( "kbd_oct", "kbd_oct", 280, 60, ["+3", "+2","+1", "normal", "-1", "-2", "-3"], 3, onChangeOctave ) );
 	synthBox.appendChild( master );
 
 } 

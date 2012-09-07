@@ -108,10 +108,10 @@ function WaveShaper(context) {
     this.output = postGain;
     this.waveshaper = waveshaper;
     
-//    var curve = new Float32Array(65536); // FIXME: share across instances
-//    generateColortouchCurve(curve);
-//    waveshaper.curve = curve;
-    waveshaper.curve = createShaperCurve();
+    var curve = new Float32Array(65536); // FIXME: share across instances
+    generateColortouchCurve(curve);
+    waveshaper.curve = curve;
+//    waveshaper.curve = createShaperCurve();
 }
 
 WaveShaper.prototype.setDrive = function(drive) {

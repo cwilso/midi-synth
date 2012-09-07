@@ -1,6 +1,12 @@
 var voices = new Array();
 var audioContext = null;
 
+// This is the "initial patch"
+var currentModWaveform = 0;	// SINE
+var currentModFrequency = 22; // Hz * 10 = 2.2
+var currentModOsc1 = 11;
+var currentModOsc2 = 0;
+
 var currentOsc1Waveform = 2; // SAW
 var currentOsc1Octave = 1;  // 16'
 var currentOsc1Detune = 0;	// 0
@@ -13,7 +19,7 @@ var currentOsc2Mix = 50.0;	// 0%
 
 var currentFilterFrequency = 1500.0;
 var currentFilterQ = 5.0;
-var currentFilterMod = 0;
+var currentFilterMod = 10;
 var currentFilterEnv = 67;
 
 var currentEnvA = 10;
@@ -26,9 +32,10 @@ var currentFilterEnvD = 15;
 var currentFilterEnvS = 50;
 var currentFilterEnvR = 40;
 
-var currentRev = 0;
-var currentDrive = 0;
+var currentDrive = 10;
+var currentRev = 25;
 var currentVol = 75;
+// end initial patch
 
 var keys = new Array( 256 );
 keys[65] = 60; // = C4 ("middle C")
@@ -96,11 +103,52 @@ function controller( number, value ) {
   }
 }
 
+function onUpdateModWaveform( ev ) {
+	currentModWaveform = ev.target.selectedIndex;
+	for (var i=0; i<255; i++) {
+		if (voices[i] != null) {
+			voices[i].setModWaveform( currentModWaveform );
+		}
+	}
+}
+
+function onUpdateModFrequency( value ) {
+	if (value.currentTarget)
+		value = value.currentTarget.value;
+	currentModFrequency = value;
+	for (var i=0; i<255; i++) {
+		if (voices[i] != null) {
+			voices[i].updateModFrequency( currentModFrequency );
+		}
+	}
+}
+
+function onUpdateModOsc1( value ) {
+	if (value.currentTarget)
+		value = value.currentTarget.value;
+	currentModOsc1 = value;
+	for (var i=0; i<255; i++) {
+		if (voices[i] != null) {
+			voices[i].updateModOsc1( value );
+		}
+	}
+}
+
+function onUpdateModOsc2( value ) {
+	if (value.currentTarget)
+		value = value.currentTarget.value;
+	currentModOsc2 = value;
+	for (var i=0; i<255; i++) {
+		if (voices[i] != null) {
+			voices[i].updateModOsc2( value );
+		}
+	}
+}
+
 function onUpdateFilterFrequency( value ) {
 	if (value.currentTarget)
 		value = value.currentTarget.value;
 	currentFilterFrequency = value;
-//	console.log("update Filter Freq: " + value);
 	for (var i=0; i<255; i++) {
 		if (voices[i] != null) {
 			voices[i].setFilterFrequency( value );
@@ -112,10 +160,20 @@ function onUpdateFilterQ( value ) {
 	if (value.currentTarget)
 		value = value.currentTarget.value;
 	currentFilterQ = value;
-//	console.log("update Filter Q: " + value);
 	for (var i=0; i<255; i++) {
 		if (voices[i] != null) {
 			voices[i].setFilterQ( value );
+		}
+	}
+}
+
+function onUpdateFilterMod( value ) {
+	if (value.currentTarget)
+		value = value.currentTarget.value;
+	currentFilterMod = value;
+	for (var i=0; i<255; i++) {
+		if (voices[i] != null) {
+			voices[i].setFilterMod( value );
 		}
 	}
 }
@@ -238,7 +296,7 @@ function onUpdateFilterEnvR( value ) {
 
 function onUpdateDrive( value ) {
 	currentDrive = value;
-    waveshaper.setDrive( 0.1 + (currentDrive*currentDrive/50.0) );
+    waveshaper.setDrive( 0.01 + (currentDrive*currentDrive/500.0) );
 }
 
 function onUpdateVolume( value ) {
@@ -298,6 +356,22 @@ function Voice( note, velocity ) {
 	this.osc2Gain.gain.value = 0.005 * currentOsc2Mix;
 	this.osc2.connect( this.osc2Gain );
 
+	// create modulator osc
+	this.modOsc = audioContext.createOscillator();
+	this.modOsc.type = currentModWaveform;
+	this.modOsc.frequency.value = currentModFrequency/10;
+
+	this.modOsc1Gain = audioContext.createGainNode();
+	this.modOsc.connect( this.modOsc1Gain );
+	this.modOsc1Gain.gain.value = currentModOsc1/10;
+	this.modOsc1Gain.connect( this.osc1.frequency );	// tremolo
+
+	this.modOsc2Gain = audioContext.createGainNode();
+	this.modOsc.connect( this.modOsc2Gain );
+	this.modOsc2Gain.gain.value = currentModOsc2/10;
+	this.modOsc2Gain.connect( this.osc2.frequency );	// tremolo
+
+	// create the LP filter
 	this.filter1 = audioContext.createBiquadFilter();
 	this.filter1.type = this.filter1.LOWPASS;
 	this.filter1.Q.value = currentFilterQ;
@@ -309,10 +383,19 @@ function Voice( note, velocity ) {
 	this.osc2Gain.connect( this.filter1 );
 	this.filter1.connect( this.filter2 );
 
+	// connect the modulator to the filters
+	this.modFilterGain = audioContext.createGainNode();
+	this.modOsc.connect( this.modFilterGain );
+	this.modFilterGain.gain.value = currentFilterMod*10;
+	this.modFilterGain.connect( this.filter1.frequency );	// filter tremolo
+	this.modFilterGain.connect( this.filter2.frequency );	// filter tremolo
+
+	// create the volume envelope
 	this.envelope = audioContext.createGainNode();
 	this.filter2.connect( this.envelope );
 	this.envelope.connect( effectChain );
 
+	// set up the volume and filter envelopes
 	var now = audioContext.currentTime;
 	var envAttackEnd = now + (currentEnvA/100.0);
 	var filterAttackEnd = now + (currentFilterEnvA/100.0);
@@ -326,8 +409,27 @@ function Voice( note, velocity ) {
 	this.filter2.frequency.setValueAtTime( initFilter, now );
 	this.filter2.frequency.linearRampToValueAtTime( currentFilterFrequency, filterAttackEnd );
 	this.filter2.frequency.linearRampToValueAtTime( initFilter + (currentFilterFrequency * currentFilterEnv * currentFilterEnvS/10000.0), filterAttackEnd + (currentFilterEnvD/100.0) );
+
 	this.osc1.noteOn(0);
 	this.osc2.noteOn(0);
+	this.modOsc.noteOn(0);
+}
+
+
+Voice.prototype.setModWaveform = function( value ) {
+	this.modOsc.type = value;
+}
+
+Voice.prototype.updateModFrequency = function( value ) {
+	this.modOsc.frequency.value = value/10;
+}
+
+Voice.prototype.updateModOsc1 = function( value ) {
+	this.modOsc1Gain.gain.value = value/10;
+}
+
+Voice.prototype.updateModOsc2 = function( value ) {
+	this.modOsc2Gain.gain.value = value/10;
 }
 
 Voice.prototype.setOsc1Waveform = function( value ) {
@@ -340,7 +442,7 @@ Voice.prototype.updateOsc1Frequency = function( value ) {
 }
 
 Voice.prototype.updateOsc1Mix = function( value ) {
-	this.osc1Gain.gain.value = 0.0033 * value;
+	this.osc1Gain.gain.value = 0.005 * value;
 }
 
 Voice.prototype.setOsc2Waveform = function( value ) {
@@ -353,7 +455,7 @@ Voice.prototype.updateOsc2Frequency = function( value ) {
 }
 
 Voice.prototype.updateOsc2Mix = function( value ) {
-	this.osc2Gain.gain.value = 0.0033 * value;
+	this.osc2Gain.gain.value = 0.005 * value;
 }
 
 Voice.prototype.setFilterFrequency = function( value ) {
@@ -371,6 +473,10 @@ Voice.prototype.setFilterQ = function( value ) {
 	this.filter2.Q.value = value;
 }
 
+Voice.prototype.setFilterMod = function( value ) {
+	this.modFilterGain.gain.value = currentFilterMod*10;
+}
+
 Voice.prototype.noteOff = function() {
 	var now =  audioContext.currentTime;
 	this.envelope.gain.cancelScheduledValues(now);
@@ -381,10 +487,12 @@ Voice.prototype.noteOff = function() {
 	this.osc2.noteOff( release );
 }
 
+var currentOctave = 3;
+
 function keyDown( ev ) {
 	var note = keys[ev.keyCode];
 	if (note)
-		noteOn( note, 0.75 );
+		noteOn( note + 12*(3-currentOctave), 0.75 );
 //	console.log( "key down: " + ev.keyCode );
 	return false;
 }
@@ -392,10 +500,15 @@ function keyDown( ev ) {
 function keyUp( ev ) {
 	var note = keys[ev.keyCode];
 	if (note)
-		noteOff( note );
+		noteOff( note + 12*(3-currentOctave) );
 //	console.log( "key up: " + ev.keyCode );
 	return false;
 }
+
+function onChangeOctave( ev ) {
+	currentOctave = ev.target.selectedIndex;
+}
+
 
 function initAudio() {
 	try {
@@ -439,14 +552,6 @@ function initAudio() {
 	}
 	irRRequest.send();
 
-
-}
-
-
-
-	null;
-
-function createShaperCurve() {
 
 }
 
