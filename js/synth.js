@@ -27,7 +27,7 @@ var currentFilterEnvS = 50;
 var currentFilterEnvR = 40;
 
 var currentRev = 0;
-var currentOverdrive = 0;
+var currentDrive = 50;
 var currentVol = 50;
 
 var keys = new Array( 256 );
@@ -52,6 +52,11 @@ keys[222] = 77; // = F5
 keys[221] = 78;
 keys[13] = 79;
 keys[220] = 80;
+
+var effectChain = null;
+var waveshaper = null;
+var volNode = null;
+var revNode = null;
 
 function frequencyFromNoteNumber( note ) {
 	return 440 * Math.pow(2,(note-69)/12);
@@ -229,6 +234,11 @@ function onUpdateFilterEnvR( value ) {
 	currentFilterEnvR = value;
 }
 
+function onUpdateDrive( value ) {
+	currentDrive = value;
+    waveshaper.setDrive( currentDrive/500.0 );
+}
+
 /*
 var FOURIER_SIZE = 4096;
 var wave = false;
@@ -284,7 +294,8 @@ function Voice( note, velocity ) {
 
 	this.envelope = audioContext.createGainNode();
 	this.filter2.connect( this.envelope );
-	this.envelope.connect( audioContext.destination );
+	this.envelope.connect( effectChain );
+
 	var now = audioContext.currentTime;
 	var envAttackEnd = now + (currentEnvA/100.0);
 	var filterAttackEnd = now + (currentFilterEnvA/100.0);
@@ -379,6 +390,28 @@ function initAudio() {
 	window.addEventListener('keydown', keyDown, false);
 	window.addEventListener('keyup', keyUp, false);
 	setupSynthUI();
+
+	// set up the master effects chain for all voices to connect to.
+	effectChain = audioContext.createGainNode();
+	waveshaper = new WaveShaper( audioContext );
+    effectChain.connect( waveshaper.input );
+    onUpdateDrive( currentDrive );
+//    revNode = audioContext.createConvolutionNode();
+    volNode = audioContext.createGainNode();
+    volNode.gain.value = currentVol;
+    waveshaper.output.connect( // revNode );
+    //revNode.connect( 
+    	volNode );
+    volNode.connect( audioContext.destination );
+
+}
+
+
+
+	null;
+
+function createShaperCurve() {
+
 }
 
 window.onload=initAudio;

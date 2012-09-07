@@ -123,7 +123,7 @@ function setupSynthUI() {
 	synthBox.appendChild( volumeEnv );
 
 	var master = createSection( "master", 518, 254, 355, 98 );	
-	master.appendChild( createKnob( "ovr", "drive",      80,   10, 20, 0, 100, currentOverdrive, "yellow", null ) );
+	master.appendChild( createKnob( "drive", "drive",    80,   10, 20, 0, 100, currentDrive, "yellow", onUpdateDrive ) );
 	master.appendChild( createKnob( "rev", "reverb",     80,  100, 20, 0, 100, currentRev, "yellow", null ) );
 	master.appendChild( createKnob( "vol", "volume",     80,  190, 20, 0, 100, currentVol, "yellow", null ) );
 	master.appendChild( createDropdown( "midi_in", 280, 15, ["-none-","-", "-"], 0, null ) );
