@@ -27,7 +27,7 @@ var currentFilterEnvS = 50;
 var currentFilterEnvR = 40;
 
 var currentRev = 0;
-var currentDrive = 50;
+var currentDrive = 0;
 var currentVol = 50;
 
 var keys = new Array( 256 );
@@ -236,7 +236,7 @@ function onUpdateFilterEnvR( value ) {
 
 function onUpdateDrive( value ) {
 	currentDrive = value;
-    waveshaper.setDrive( currentDrive/500.0 );
+    waveshaper.setDrive( 0.1 + currentDrive/50.0 );
 }
 
 /*
@@ -268,7 +268,7 @@ function Voice( note, velocity ) {
 	this.osc1.type = currentOsc1Waveform;
 
 	this.osc1Gain = audioContext.createGainNode();
-	this.osc1Gain.gain.value = 0.0033 * currentOsc1Mix;
+	this.osc1Gain.gain.value = 0.0002 * currentOsc1Mix;
 //	this.gain.gain.value = 0.05 + (0.33 * velocity);
 	this.osc1.connect( this.osc1Gain );
 
@@ -278,7 +278,7 @@ function Voice( note, velocity ) {
 	this.osc2.type = currentOsc2Waveform;
 
 	this.osc2Gain = audioContext.createGainNode();
-	this.osc2Gain.gain.value = 0.0033 * currentOsc2Mix;
+	this.osc2Gain.gain.value = 0.0002 * currentOsc2Mix;
 	this.osc2.connect( this.osc2Gain );
 
 	this.filter1 = audioContext.createBiquadFilter();
