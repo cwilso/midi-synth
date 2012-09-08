@@ -427,18 +427,21 @@ function Voice( note, velocity ) {
 
 	// set up the volume and filter envelopes
 	var now = audioContext.currentTime;
-	var envAttackEnd = now + (currentEnvA/100.0);
-	var filterAttackEnd = now + (currentFilterEnvA/100.0);
-	this.envelope.gain.setValueAtTime( 0, now );
-	this.envelope.gain.linearRampToValueAtTime( 1.0, envAttackEnd );
-	this.envelope.gain.linearRampToValueAtTime( (currentEnvS/100.0), envAttackEnd + (currentEnvD/100.0) );
+	var envAttackEnd = now + (currentEnvA/100.0)
+	console.log( "envA: " + currentEnvA + "now: " + now + "attackEnd: " + envAttackEnd);
+	var filterAttackEnd = now + (currentFilterEnvA/200.0);
+	this.envelope.gain.setValueAtTime( 0.001, now ); // exponential ramps can't start at zero
+	this.envelope.gain.exponentialRampToValueAtTime( 1.0, envAttackEnd );
+	this.envelope.gain.exponentialRampToValueAtTime( (currentEnvS/100.0), envAttackEnd + (currentEnvD/100.0) );
 	var initFilter = currentFilterFrequency * (1.0-(currentFilterEnv/100.0));
+	if (initFilter==0.0)
+		initFilter = 0.001; // exponential ramps can't start at zero
 	this.filter1.frequency.setValueAtTime( initFilter, now );
-	this.filter1.frequency.linearRampToValueAtTime( currentFilterFrequency, filterAttackEnd );
-	this.filter1.frequency.linearRampToValueAtTime( initFilter + (currentFilterFrequency * currentFilterEnv * currentFilterEnvS/10000.0), filterAttackEnd + (currentFilterEnvD/100.0) );
+	this.filter1.frequency.exponentialRampToValueAtTime( currentFilterFrequency, filterAttackEnd );
+	this.filter1.frequency.exponentialRampToValueAtTime( initFilter + (currentFilterFrequency * currentFilterEnv * currentFilterEnvS/10000.0), filterAttackEnd + (currentFilterEnvD/100.0) );
 	this.filter2.frequency.setValueAtTime( initFilter, now );
-	this.filter2.frequency.linearRampToValueAtTime( currentFilterFrequency, filterAttackEnd );
-	this.filter2.frequency.linearRampToValueAtTime( initFilter + (currentFilterFrequency * currentFilterEnv * currentFilterEnvS/10000.0), filterAttackEnd + (currentFilterEnvD/100.0) );
+	this.filter2.frequency.exponentialRampToValueAtTime( currentFilterFrequency, filterAttackEnd );
+	this.filter2.frequency.exponentialRampToValueAtTime( initFilter + (currentFilterFrequency * currentFilterEnv * currentFilterEnvS/10000.0), filterAttackEnd + (currentFilterEnvD/100.0) );
 
 	this.osc1.noteOn(0);
 	this.osc2.noteOn(0);
@@ -509,10 +512,12 @@ Voice.prototype.setFilterMod = function( value ) {
 
 Voice.prototype.noteOff = function() {
 	var now =  audioContext.currentTime;
+	var value = this.envelope.gain.value;
 	this.envelope.gain.cancelScheduledValues(now);
-	this.envelope.gain.setValueAtTime( this.envelope.gain.value, now );
-	var release = now + (currentEnvR/100.0);
-	this.envelope.gain.linearRampToValueAtTime( 0.0, release );
+	this.envelope.gain.setValueAtTime( value, now );
+	var release = now + (currentEnvR/10.0);
+	if (value > 0.0)
+		this.envelope.gain.exponentialRampToValueAtTime( 0.001, release );
 	this.osc1.noteOff( release );
 	this.osc2.noteOff( release );
 }
