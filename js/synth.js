@@ -96,10 +96,40 @@ function controller( number, value ) {
     onUpdateFilterFrequency( currentFilterFrequency );
     return;
   } else if (number == 2) {
-    currentFilterQ = 40 * value;
+    currentFilterQ = 20 * value;
     $("#fQ").val( currentFilterQ );
     $("#fQ").trigger('change');
     onUpdateFilterQ( currentFilterQ );
+  } else if (number == 3) {
+    currentDrive = 100 * value;
+    $("#drive").val( currentDrive );
+    $("#drive").trigger('change');
+    onUpdateDrive( currentDrive );
+  } else if (number == 4) {
+    currentRev = 100 * value;
+    $("#reverb").val( currentRev );
+    $("#reverb").trigger('change');
+    onUpdateReverb( currentRev );
+  } else if (number == 5) {
+    currentModFrequency = 100 * value;
+    $("#mFreq").val( currentModFrequency );
+    $("#mFreq").trigger('change');
+    onUpdateModFrequency( currentModFrequency );
+  } else if (number == 6) {
+    currentModOsc1 = 100 * value;
+    $("#modOsc1").val( currentModOsc1 );
+    $("#modOsc1").trigger('change');
+    onUpdateModOsc1( currentModOsc1 );
+  } else if (number == 7) {
+    currentModOsc2 = 100 * value;
+    $("#modOsc2").val( currentModOsc2 );
+    $("#modOsc2").trigger('change');
+    onUpdateModOsc2( currentModOsc2 );
+  } else if (number == 8) {
+    currentVol = 100 * value;
+    $("#volume").val( currentVol );
+    $("#volume").trigger('change');
+    onUpdateVolume( currentVol );
   }
 }
 

@@ -79,8 +79,8 @@ function setupSynthUI() {
 	var mod = createSection( "mod", 10, 10, 87, 342 );
 	mod.appendChild( createDropdown( "modwave", "shape", 12, 15, ["sine","square", "saw", "triangle"], currentModWaveform, onUpdateModWaveform ))
 	mod.appendChild( createKnob( "mFreq", "freq*10", 80, 12, 65, 0, 100, currentModFrequency, "#c10087", onUpdateModFrequency ) );
-	mod.appendChild( createKnob( "mDepth1", "osc1 tremolo", 80, 12, 160, 0, 100, currentModOsc1, "#c10087", onUpdateModOsc1 ) );
-	mod.appendChild( createKnob( "mDepth2", "osc2 tremolo", 80, 12, 255, 0, 100, currentModOsc2, "#c10087", onUpdateModOsc2 ) );
+	mod.appendChild( createKnob( "modOsc1", "osc1 tremolo", 80, 12, 160, 0, 100, currentModOsc1, "#c10087", onUpdateModOsc1 ) );
+	mod.appendChild( createKnob( "modOsc2", "osc2 tremolo", 80, 12, 255, 0, 100, currentModOsc2, "#c10087", onUpdateModOsc2 ) );
 	synthBox.appendChild( mod );
 
 	var osc1 = createSection( "OSC1", 130, 10, 240, 160 );	
@@ -120,8 +120,8 @@ function setupSynthUI() {
 
 	var master = createSection( "master", 518, 254, 355, 98 );	
 	master.appendChild( createKnob( "drive", "drive",    80,   10, 20, 0, 100, currentDrive, "yellow", onUpdateDrive ) );
-	master.appendChild( createKnob( "rev", "reverb",     80,  100, 20, 0, 100, currentRev, "yellow", onUpdateReverb ) );
-	master.appendChild( createKnob( "vol", "volume",     80,  190, 20, 0, 100, currentVol, "yellow", onUpdateVolume ) );
+	master.appendChild( createKnob( "reverb", "reverb",     80,  100, 20, 0, 100, currentRev, "yellow", onUpdateReverb ) );
+	master.appendChild( createKnob( "volume", "volume",     80,  190, 20, 0, 100, currentVol, "yellow", onUpdateVolume ) );
 	master.appendChild( createDropdown( "midiIn", "midi_in", 280, 15, ["-no MIDI-"], 0, changeMIDIPort ) );
 	master.appendChild( createDropdown( "kbd_oct", "kbd_oct", 280, 60, ["+3", "+2","+1", "normal", "-1", "-2", "-3"], 3, onChangeOctave ) );
 	synthBox.appendChild( master );
