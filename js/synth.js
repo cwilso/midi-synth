@@ -17,17 +17,17 @@ var currentOsc2Octave = 1;  // 8'
 var currentOsc2Detune = 15;	// slight detune makes pretty analogue-y sound.  :)
 var currentOsc2Mix = 50.0;	// 0%
 
-var currentFilterFrequency = 1500.0;
+var currentFilterCutoff = 67.0;
 var currentFilterQ = 5.0;
 var currentFilterMod = 10;
 var currentFilterEnv = 67;
 
-var currentEnvA = 10;
+var currentEnvA = 7;
 var currentEnvD = 15;
 var currentEnvS = 75;
 var currentEnvR = 20;
 
-var currentFilterEnvA = 35;
+var currentFilterEnvA = 25;
 var currentFilterEnvD = 15;
 var currentFilterEnvS = 50;
 var currentFilterEnvR = 40;
@@ -90,10 +90,10 @@ function noteOff( note ) {
 // 'value' is normalized to 0..1.
 function controller( number, value ) {
   if (number == 1) {
-    currentFilterFrequency = 5000 * value;
-    $("#fFreq").val( currentFilterFrequency );
+    currentFilterCutoff = 100 * value;
+    $("#fFreq").val( currentFilterCutoff );
     $("#fFreq").trigger('change');
-    onUpdateFilterFrequency( currentFilterFrequency );
+    onUpdateFilterCutoff( currentFilterCutoff );
     return;
   } else if (number == 2) {
     currentFilterQ = 20 * value;
@@ -175,13 +175,13 @@ function onUpdateModOsc2( value ) {
 	}
 }
 
-function onUpdateFilterFrequency( value ) {
+function onUpdateFilterCutoff( value ) {
 	if (value.currentTarget)
 		value = value.currentTarget.value;
-	currentFilterFrequency = value;
+	currentFilterCutoff = value;
 	for (var i=0; i<255; i++) {
 		if (voices[i] != null) {
-			voices[i].setFilterFrequency( value );
+			voices[i].setFilterCutoff( value );
 		}
 	}
 }
@@ -364,6 +364,16 @@ var wave = false;
 	} else {
 
 */
+
+function filterFrequencyFromCutoff( pitch, cutoff ) {
+    var nyquist = 0.5 * audioContext.sampleRate;
+
+    var filterFrequency = Math.pow(2, (9 * cutoff) - 1) * pitch;
+    if (filterFrequency > nyquist)
+        filterFrequency = nyquist;
+	return filterFrequency;
+}
+
 function Voice( note, velocity ) {
 	this.originalFrequency = frequencyFromNoteNumber( note );
 
@@ -428,20 +438,26 @@ function Voice( note, velocity ) {
 	// set up the volume and filter envelopes
 	var now = audioContext.currentTime;
 	var envAttackEnd = now + (currentEnvA/100.0)
-	console.log( "envA: " + currentEnvA + "now: " + now + "attackEnd: " + envAttackEnd);
 	var filterAttackEnd = now + (currentFilterEnvA/200.0);
 	this.envelope.gain.setValueAtTime( 0.001, now ); // exponential ramps can't start at zero
 	this.envelope.gain.exponentialRampToValueAtTime( 1.0, envAttackEnd );
 	this.envelope.gain.exponentialRampToValueAtTime( (currentEnvS/100.0), envAttackEnd + (currentEnvD/100.0) );
-	var initFilter = currentFilterFrequency * (1.0-(currentFilterEnv/100.0));
+
+    var pitchFrequency = this.originalFrequency;
+    var initFilter = filterFrequencyFromCutoff( pitchFrequency, currentFilterCutoff/100 * (1.0-(currentFilterEnv/100.0)) );
 	if (initFilter==0.0)
 		initFilter = 0.001; // exponential ramps can't start at zero
+
+	var attackFilter = filterFrequencyFromCutoff( pitchFrequency, currentFilterCutoff/100 );
+	var tmp = currentFilterCutoff/100 * (1.0-((currentFilterEnv/100) * (1.0 - (currentFilterEnvS/100.0))));
+	var sustainFilter = filterFrequencyFromCutoff( pitchFrequency, tmp );
+
 	this.filter1.frequency.setValueAtTime( initFilter, now );
-	this.filter1.frequency.exponentialRampToValueAtTime( currentFilterFrequency, filterAttackEnd );
-	this.filter1.frequency.exponentialRampToValueAtTime( initFilter + (currentFilterFrequency * currentFilterEnv * currentFilterEnvS/10000.0), filterAttackEnd + (currentFilterEnvD/100.0) );
+	this.filter1.frequency.exponentialRampToValueAtTime( attackFilter, filterAttackEnd );
+	this.filter1.frequency.exponentialRampToValueAtTime( sustainFilter, filterAttackEnd + (currentFilterEnvD/100.0) );
 	this.filter2.frequency.setValueAtTime( initFilter, now );
-	this.filter2.frequency.exponentialRampToValueAtTime( currentFilterFrequency, filterAttackEnd );
-	this.filter2.frequency.exponentialRampToValueAtTime( initFilter + (currentFilterFrequency * currentFilterEnv * currentFilterEnvS/10000.0), filterAttackEnd + (currentFilterEnvD/100.0) );
+	this.filter2.frequency.exponentialRampToValueAtTime( attackFilter, filterAttackEnd );
+	this.filter2.frequency.exponentialRampToValueAtTime( sustainFilter, filterAttackEnd + (currentFilterEnvD/100.0) );
 
 	this.osc1.noteOn(0);
 	this.osc2.noteOn(0);
@@ -491,17 +507,16 @@ Voice.prototype.updateOsc2Mix = function( value ) {
 	this.osc2Gain.gain.value = 0.005 * value;
 }
 
-Voice.prototype.setFilterFrequency = function( value ) {
+Voice.prototype.setFilterCutoff = function( value ) {
 	var now =  audioContext.currentTime;
+	var filterFrequency = filterFrequencyFromCutoff( this.originalFrequency, value/100 );
 	this.filter1.frequency.cancelScheduledValues( now );
-	this.filter1.frequency.setValueAtTime(value, now );
+	this.filter1.frequency.setValueAtTime( filterFrequency, now );
 	this.filter2.frequency.cancelScheduledValues( now );
-	this.filter2.frequency.setValueAtTime(value, now );
-//	this.filter.frequency.value = value;
+	this.filter2.frequency.setValueAtTime( filterFrequency, now );
 }
 
 Voice.prototype.setFilterQ = function( value ) {
-//	this.filter.Q.setTargetValueAtTime( value, audioContext.currentTime, 0.1 );
 	this.filter1.Q.value = value;
 	this.filter2.Q.value = value;
 }

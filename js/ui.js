@@ -98,7 +98,7 @@ function setupSynthUI() {
 	synthBox.appendChild( osc2 );
 
 	var filter = createSection( "filter", 404, 10, 80, 342 );	
-	filter.appendChild( createKnob( "fFreq", "freq", 75, 12, 15, 0, 5000, currentFilterFrequency, "#ffaa00", onUpdateFilterFrequency ) );
+	filter.appendChild( createKnob( "fFreq", "cutoff", 75, 12, 15, 0, 100, currentFilterCutoff, "#ffaa00", onUpdateFilterCutoff ) );
 	filter.appendChild( createKnob( "fQ", "q",       75, 12, 100, 0, 20, currentFilterQ, "#ffaa00", onUpdateFilterQ ) );
 	filter.appendChild( createKnob( "fMod", "mod",   75, 12, 185, 0, 100, currentFilterMod, "#ffaa00", onUpdateFilterMod ) );
 	filter.appendChild( createKnob( "fEnv", "env",   75, 12, 270, 0, 100, currentFilterEnv, "#ffaa00", onUpdateFilterEnv ) );
