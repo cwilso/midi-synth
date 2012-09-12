@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8" />
-	<title>MIDI Web Audio Wavetable Synth</title>
+	<title>Web Audio Synthesizer (MIDIfied)</title>
 	<link href='http://fonts.googleapis.com/css?family=Syncopate:400,700' rel='stylesheet' type='text/css'>
 
 	<!-- Set up Web MIDI polyfill -->
@@ -29,6 +29,13 @@
     .dropdownContainer { position:absolute; }
     .dropdownLabel { position:absolute; left: 5px; top:0px; font-weight: bold;}
     .dropdownSelect { position:absolute; left: 0px; top:15px; font: 12px 'Syncopate', sans-serif;}
+    #keybox {width:910px; text-align: center;}
+    #blackkeys { position: absolute; z-index: 2; padding-left: 10px; margin-left: 41px;}
+    .key { display:inline-block; }
+    .black { background: black; width: 40px; height: 150px; margin: 0px 11px; border-bottom-right-radius: 5px; border-bottom-left-radius: 5px; }
+    .spacer { display:inline-block; width: 62px; height: 150px; margin: }
+    .white { background: white; width: 60px; height: 250px; border: 1px solid black; border-bottom-right-radius: 5px; border-bottom-left-radius: 5px; }
+    .pressed { background: gray }
 	</style>
 </head>
 
@@ -41,13 +48,11 @@
         </div>
 -->
     </div>
-<!--
-	<p>
-		MIDI Input:
-		<select id="midiIn" onchange='changeMIDIPort();'>
-			<option value="">Still loading MIDI system...</option>
-		</select>
-	</p>
--->
+    <div id="keybox">
+        <div id="blackkeys">
+            <span id="k61" class="black key"></span><span id="k63" class="black key"></span><span class="spacer"></span><span id="k66" class="black key"></span><span id="k68" class="black key"></span><span id="k70" class="black key"></span><span class="spacer"></span><span id="k73" class="black key"></span><span id="k75" class="black key"></span><span class="spacer"></span><span id="k78" class="black key"></span><span id="k80" class="black key"></span><span id="k82" class="black key"></span>
+        </div>
+        <span id="k60" class="white key"></span><span id="k62" class="white key"></span><span id="k64" class="white key"></span><span id="k65" class="white key"></span><span id="k67" class="white key"></span><span id="k69" class="white key"></span><span id="k71" class="white key"></span><span id="k72" class="white key"></span><span id="k74" class="white key"></span><span id="k76" class="white key"></span><span id="k77" class="white key"></span><span id="k79" class="white key"></span><span id="k81" class="white key"></span><span id="k83" class="white key"></span>
+    </div>
 </body>
 </html>

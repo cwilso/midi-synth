@@ -126,4 +126,9 @@ function setupSynthUI() {
 	master.appendChild( createDropdown( "kbd_oct", "kbd_oct", 280, 60, ["+3", "+2","+1", "normal", "-1", "-2", "-3"], 3, onChangeOctave ) );
 	synthBox.appendChild( master );
 
+	var keys = document.querySelectorAll( ".key" );
+	for (var i=0; i<keys.length; i++) {
+		keys[i].onmousedown = mouseDown;
+		keys[i].onmouseup = mouseUp;
+	}
 } 

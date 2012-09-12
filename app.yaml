@@ -15,8 +15,5 @@ handlers:
 - url: /lib
   static_dir: lib
 
-- url: /theme
-  static_dir: theme
-
-- url: /images
-  static_dir: images
+- url: /sounds
+  static_dir: sounds

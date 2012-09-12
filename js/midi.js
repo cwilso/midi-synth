@@ -23,16 +23,16 @@ var midiIn = null;
 
 function changeMIDIPort() {
   var list=midiAccess.enumerateInputs();
-  midiIn = midi.getInput( list[ selectMIDI.selectedIndex ] );
+  midiIn = midiAccess.getInput( list[ selectMIDI.selectedIndex ] );
   midiIn.onmessage = midiMessageReceived;
 }
 
 function selectMIDIIn( ev ) {
-  var list=midi.enumerateInputs();
+  var list=midiAccess.enumerateInputs();
   var selectedIndex = ev.target.selectedIndex;
 
   if (list.length >= selectedIndex) {
-    midiIn = midi.getInput( list[selectedIndex] );
+    midiIn = midiAccess.getInput( list[selectedIndex] );
     midiIn.onmessage = midiMessageReceived;
   }
 }
@@ -43,7 +43,7 @@ function onMIDIStarted( midi ) {
   document.getElementById("synthbox").className = "loaded";
 
   selectMIDI=document.getElementById("midiIn");
-  var list=midi.enumerateInputs();
+  var list=midiAccess.enumerateInputs();
 
   // clear the MIDI input select
   selectMIDI.options.length = 0;
@@ -52,7 +52,7 @@ function onMIDIStarted( midi ) {
     for (var i=0; i<list.length; i++) {
       selectMIDI.options[i]=new Option(list[i].name,list[i].fingerprint,i==0,i==0);
     }
-    midiIn = midi.getInput( list[0] );
+    midiIn = midiAccess.getInput( list[0] );
     midiIn.onmessage = midiMessageReceived;
 
     selectMIDI.onchange = selectMIDIIn;

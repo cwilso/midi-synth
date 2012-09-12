@@ -75,6 +75,9 @@ function noteOn( note, velocity ) {
 	if (voices[note] == null) {
 		// Create a new synth node
 		voices[note] = new Voice(note, velocity);
+		var e = document.getElementById( "k" + note );
+		if (e)
+			e.classList.add("pressed");
 	}
 }
 
@@ -83,6 +86,9 @@ function noteOff( note ) {
 		// Shut off the note playing and clear it 
 		voices[note].noteOff();
 		voices[note] = null;
+		var e = document.getElementById( "k" + note );
+		if (e)
+			e.classList.remove("pressed");
 	}
 
 }
@@ -437,27 +443,32 @@ function Voice( note, velocity ) {
 
 	// set up the volume and filter envelopes
 	var now = audioContext.currentTime;
-	var envAttackEnd = now + (currentEnvA/100.0)
 	var filterAttackEnd = now + (currentFilterEnvA/200.0);
-	this.envelope.gain.setValueAtTime( 0.001, now ); // exponential ramps can't start at zero
-	this.envelope.gain.exponentialRampToValueAtTime( 1.0, envAttackEnd );
-	this.envelope.gain.exponentialRampToValueAtTime( (currentEnvS/100.0), envAttackEnd + (currentEnvD/100.0) );
+	var envAttackEnd = now + (currentEnvA/20.0);
+
+	this.envelope.gain.value = 0.0;
+	this.envelope.gain.setValueAtTime( 0.0, now );
+	this.envelope.gain.linearRampToValueAtTime( 1.0, envAttackEnd );
+	this.envelope.gain.setTargetValueAtTime( (currentEnvS/100.0), envAttackEnd, (currentEnvD/100.0)+0.001 );
 
     var pitchFrequency = this.originalFrequency;
-    var initFilter = filterFrequencyFromCutoff( pitchFrequency, currentFilterCutoff/100 * (1.0-(currentFilterEnv/100.0)) );
-	if (initFilter==0.0)
-		initFilter = 0.001; // exponential ramps can't start at zero
+    var filterInitLevel = filterFrequencyFromCutoff( pitchFrequency, currentFilterCutoff/100 );
+	var filterAttackLevel = filterFrequencyFromCutoff( pitchFrequency, currentFilterCutoff/100 + 
+		(currentFilterEnv/120) );
+	var filterSustainLevel = filterFrequencyFromCutoff( pitchFrequency, currentFilterCutoff/100 + 
+		((currentFilterEnv/120) * (currentFilterEnvS/100.0)) );
+	var filterAttackEnd = now + (currentFilterEnvA/20.0);
 
-	var attackFilter = filterFrequencyFromCutoff( pitchFrequency, currentFilterCutoff/100 );
-	var tmp = currentFilterCutoff/100 * (1.0-((currentFilterEnv/100) * (1.0 - (currentFilterEnvS/100.0))));
-	var sustainFilter = filterFrequencyFromCutoff( pitchFrequency, tmp );
-
-	this.filter1.frequency.setValueAtTime( initFilter, now );
-	this.filter1.frequency.exponentialRampToValueAtTime( attackFilter, filterAttackEnd );
-	this.filter1.frequency.exponentialRampToValueAtTime( sustainFilter, filterAttackEnd + (currentFilterEnvD/100.0) );
-	this.filter2.frequency.setValueAtTime( initFilter, now );
-	this.filter2.frequency.exponentialRampToValueAtTime( attackFilter, filterAttackEnd );
-	this.filter2.frequency.exponentialRampToValueAtTime( sustainFilter, filterAttackEnd + (currentFilterEnvD/100.0) );
+//	console.log( "pitchFrequency: " + pitchFrequency + " filterInitLevel: " + filterInitLevel + 
+//				 " filterAttackLevel: " + filterAttackLevel + " filterSustainLevel: " + filterSustainLevel );
+	this.filter1.frequency.value = filterInitLevel;
+	this.filter1.frequency.setValueAtTime( filterInitLevel, now );
+	this.filter1.frequency.linearRampToValueAtTime( filterAttackLevel, filterAttackEnd );
+	this.filter1.frequency.setTargetValueAtTime( filterSustainLevel, filterAttackEnd, (currentFilterEnvD/100.0) );
+	this.filter2.frequency.value = filterInitLevel;
+	this.filter2.frequency.setValueAtTime( filterInitLevel, now );
+	this.filter2.frequency.linearRampToValueAtTime( filterAttackLevel, filterAttackEnd );
+	this.filter2.frequency.setTargetValueAtTime( filterSustainLevel, filterAttackEnd, (currentFilterEnvD/100.0) );
 
 	this.osc1.noteOn(0);
 	this.osc2.noteOn(0);
@@ -527,12 +538,19 @@ Voice.prototype.setFilterMod = function( value ) {
 
 Voice.prototype.noteOff = function() {
 	var now =  audioContext.currentTime;
-	var value = this.envelope.gain.value;
+	var release = now + (currentEnvR/10.0);	
+    var initFilter = filterFrequencyFromCutoff( this.originalFrequency, currentFilterCutoff/100 * (1.0-(currentFilterEnv/100.0)) );
+
 	this.envelope.gain.cancelScheduledValues(now);
-	this.envelope.gain.setValueAtTime( value, now );
-	var release = now + (currentEnvR/10.0);
-	if (value > 0.0)
-		this.envelope.gain.exponentialRampToValueAtTime( 0.001, release );
+	this.envelope.gain.setValueAtTime( this.envelope.gain.value, now );  // this is necessary because of the linear ramp
+	this.envelope.gain.setTargetValueAtTime(0.0, now, (currentEnvR/100));
+	this.filter1.frequency.cancelScheduledValues(now);
+	this.filter1.frequency.setValueAtTime( this.filter1.frequency.value, now );  // this is necessary because of the linear ramp
+	this.filter1.frequency.setTargetValueAtTime( initFilter, now, (currentFilterEnvR/100.0) );
+	this.filter2.frequency.cancelScheduledValues(now);
+	this.filter2.frequency.setValueAtTime( this.filter2.frequency.value, now );  // this is necessary because of the linear ramp
+	this.filter2.frequency.setTargetValueAtTime( initFilter, now, (currentFilterEnvR/100.0) );
+
 	this.osc1.noteOff( release );
 	this.osc2.noteOff( release );
 }
@@ -544,6 +562,10 @@ function keyDown( ev ) {
 	if (note)
 		noteOn( note + 12*(3-currentOctave), 0.75 );
 //	console.log( "key down: " + ev.keyCode );
+
+	var e = document.getElementById( "k" + note );
+	if (e)
+		e.classList.add("pressed");
 	return false;
 }
 
@@ -552,6 +574,28 @@ function keyUp( ev ) {
 	if (note)
 		noteOff( note + 12*(3-currentOctave) );
 //	console.log( "key up: " + ev.keyCode );
+
+	var e = document.getElementById( "k" + note );
+	if (e)
+		e.classList.remove("pressed");
+	return false;
+}
+
+function mouseDown( ev ) {
+	var note = parseInt( ev.target.id.substring( 1 ) );
+	if (note != NaN)
+		noteOn( note + 12*(3-currentOctave), 0.75 );
+	console.log( "mouse down: " + note );
+	ev.target.classList.add("pressed");
+	return false;
+}
+
+function mouseUp( ev ) {
+	var note = parseInt( ev.target.id.substring( 1 ) );
+	if (note != NaN)
+		noteOff( note + 12*(3-currentOctave) );
+	console.log( "mouse up: " + note );
+	ev.target.classList.remove("pressed");
 	return false;
 }
 
