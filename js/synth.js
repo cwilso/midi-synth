@@ -444,7 +444,7 @@ function Voice( note, velocity ) {
 	// set up the volume and filter envelopes
 	var now = audioContext.currentTime;
 	var filterAttackEnd = now + (currentFilterEnvA/200.0);
-	var envAttackEnd = now + (currentEnvA/20.0);
+	var envAttackEnd = now + (currentEnvA/10.0);
 
 	this.envelope.gain.value = 0.0;
 	this.envelope.gain.setValueAtTime( 0.0, now );
