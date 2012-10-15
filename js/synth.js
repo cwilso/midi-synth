@@ -581,20 +581,20 @@ function keyUp( ev ) {
 	return false;
 }
 
-function mouseDown( ev ) {
+function pointerDown( ev ) {
 	var note = parseInt( ev.target.id.substring( 1 ) );
 	if (note != NaN)
 		noteOn( note + 12*(3-currentOctave), 0.75 );
-	console.log( "mouse down: " + note );
+//	console.log( "mouse down: " + note );
 	ev.target.classList.add("pressed");
 	return false;
 }
 
-function mouseUp( ev ) {
+function pointerUp( ev ) {
 	var note = parseInt( ev.target.id.substring( 1 ) );
 	if (note != NaN)
 		noteOff( note + 12*(3-currentOctave) );
-	console.log( "mouse up: " + note );
+//	console.log( "mouse up: " + note );
 	ev.target.classList.remove("pressed");
 	return false;
 }

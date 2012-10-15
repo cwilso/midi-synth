@@ -128,7 +128,7 @@ function setupSynthUI() {
 
 	var keys = document.querySelectorAll( ".key" );
 	for (var i=0; i<keys.length; i++) {
-		keys[i].onmousedown = mouseDown;
-		keys[i].onmouseup = mouseUp;
+		keys[i].addEventListener('pointerdown', pointerDown);
+		keys[i].addEventListener('pointerup', pointerUp);
 	}
 } 
