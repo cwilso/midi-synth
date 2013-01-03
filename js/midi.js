@@ -13,7 +13,10 @@ function midiMessageReceived( msgs ) {
       noteOn( noteNumber, velocity/127.0);
     } else if (cmd == 11) {
       controller( noteNumber, velocity/127.0);
-    }   
+    } else if (cmd == 14) {
+      // pitch wheel
+      pitchWheel( ((velocity * 128.0 + noteNumber)-8192)/8192.0 );
+    }  
   }
 }
 

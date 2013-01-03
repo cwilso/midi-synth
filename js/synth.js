@@ -139,6 +139,22 @@ function controller( number, value ) {
   }
 }
 
+var currentPitchWheel = 0.0;
+// 'value' is normalized to [-1,1]
+function pitchWheel( value ) {
+	var i;
+
+	currentPitchWheel = value;
+	for (var i=0; i<255; i++) {
+		if (voices[i]) {
+			if (voices[i].osc1)
+				voices[i].osc1.detune.value = currentOsc1Detune + currentPitchWheel * 500;	// value in cents - detune major fifth.
+			if (voices[i].osc2)
+				voices[i].osc2.detune.value = currentOsc2Detune + currentPitchWheel * 500;	// value in cents - detune major fifth.
+		}
+	}
+}
+
 function onUpdateModWaveform( ev ) {
 	currentModWaveform = ev.target.selectedIndex;
 	for (var i=0; i<255; i++) {
@@ -498,7 +514,7 @@ Voice.prototype.setOsc1Waveform = function( value ) {
 
 Voice.prototype.updateOsc1Frequency = function( value ) {
 	this.osc1.frequency.value = (this.originalFrequency*Math.pow(2,currentOsc1Octave-2));  // -2 because osc1 is 32', 16', 8'
-	this.osc1.detune.value = currentOsc1Detune;
+	this.osc1.detune.value = currentOsc1Detune + currentPitchWheel * 500;	// value in cents - detune major fifth.
 }
 
 Voice.prototype.updateOsc1Mix = function( value ) {
@@ -511,7 +527,7 @@ Voice.prototype.setOsc2Waveform = function( value ) {
 
 Voice.prototype.updateOsc2Frequency = function( value ) {
 	this.osc2.frequency.value = (this.originalFrequency*Math.pow(2,currentOsc2Octave-1));
-	this.osc2.detune.value = currentOsc2Detune;
+	this.osc2.detune.value = currentOsc2Detune + currentPitchWheel * 500;	// value in cents - detune major fifth.
 }
 
 Voice.prototype.updateOsc2Mix = function( value ) {
