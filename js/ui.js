@@ -122,7 +122,7 @@ function setupSynthUI() {
 	master.appendChild( createKnob( "drive", "drive",    80,   10, 20, 0, 100, currentDrive, "yellow", onUpdateDrive ) );
 	master.appendChild( createKnob( "reverb", "reverb",     80,  100, 20, 0, 100, currentRev, "yellow", onUpdateReverb ) );
 	master.appendChild( createKnob( "volume", "volume",     80,  190, 20, 0, 100, currentVol, "yellow", onUpdateVolume ) );
-	master.appendChild( createDropdown( "midiIn", "midi_in", 280, 15, ["-no MIDI-"], 0, changeMIDIPort ) );
+	master.appendChild( createDropdown( "midiIn", "midi_in", 280, 15, ["-no MIDI-"], 0, selectMIDIIn ) );
 	master.appendChild( createDropdown( "kbd_oct", "kbd_oct", 280, 60, ["+3", "+2","+1", "normal", "-1", "-2", "-3"], 3, onChangeOctave ) );
 	synthBox.appendChild( master );
 

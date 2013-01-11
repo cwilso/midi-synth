@@ -1,43 +1,30 @@
-function midiMessageReceived( msgs ) {
-  for (i=0; i<msgs.length; i++) {
-    var cmd = msgs[i].data[0] >> 4;
-    var channel = msgs[i].data[0] & 0xf;
-    var noteNumber = msgs[i].data[1];
-    var velocity = msgs[i].data[2];
+function midiMessageReceived( ev ) {
+  var cmd = ev.data[0] >> 4;
+  var channel = ev.data[0] & 0xf;
+  var noteNumber = ev.data[1];
+  var velocity = ev.data[2];
 
-    if ( cmd==8 || ((cmd==9)&&(velocity==0)) ) { // with MIDI, note on with velocity zero is the same as note off
-      // note off
-      noteOff( noteNumber );
-    } else if (cmd == 9) {
-      // note on
-      noteOn( noteNumber, velocity/127.0);
-    } else if (cmd == 11) {
-      controller( noteNumber, velocity/127.0);
-    } else if (cmd == 14) {
-      // pitch wheel
-      pitchWheel( ((velocity * 128.0 + noteNumber)-8192)/8192.0 );
-    }  
-  }
+  if ( cmd==8 || ((cmd==9)&&(velocity==0)) ) { // with MIDI, note on with velocity zero is the same as note off
+    // note off
+    noteOff( noteNumber );
+  } else if (cmd == 9) {
+    // note on
+    noteOn( noteNumber, velocity/127.0);
+  } else if (cmd == 11) {
+    controller( noteNumber, velocity/127.0);
+  } else if (cmd == 14) {
+    // pitch wheel
+    pitchWheel( ((velocity * 128.0 + noteNumber)-8192)/8192.0 );
+  }  
 }
 
 var selectMIDI = null;
 var midiAccess = null;
 var midiIn = null;
 
-function changeMIDIPort() {
-  var list=midiAccess.enumerateInputs();
-  midiIn = midiAccess.getInput( list[ selectMIDI.selectedIndex ] );
-  midiIn.onmessage = midiMessageReceived;
-}
-
 function selectMIDIIn( ev ) {
-  var list=midiAccess.enumerateInputs();
-  var selectedIndex = ev.target.selectedIndex;
-
-  if (list.length >= selectedIndex) {
-    midiIn = midiAccess.getInput( list[selectedIndex] );
-    midiIn.onmessage = midiMessageReceived;
-  }
+  midiIn = midiAccess.getInput( selectMIDI.selectedIndex );
+  midiIn.onmessage = midiMessageReceived;
 }
 
 function onMIDIStarted( midi ) {
@@ -46,7 +33,7 @@ function onMIDIStarted( midi ) {
   document.getElementById("synthbox").className = "loaded";
 
   selectMIDI=document.getElementById("midiIn");
-  var list=midiAccess.enumerateInputs();
+  var list=midiAccess.getInputs();
 
   // clear the MIDI input select
   selectMIDI.options.length = 0;
@@ -62,12 +49,13 @@ function onMIDIStarted( midi ) {
   }
 }
 
-function onMIDISystemError( msg ) {
+function onMIDISystemError( err ) {
   document.getElementById("synthbox").className = "error";
-  console.log( "Error encountered:" + msg );
+  console.log( "Error encountered:" + err.code );
 }
+
 //init: start up MIDI
 window.addEventListener('load', function() {   
-  navigator.getMIDIAccess( onMIDIStarted, onMIDISystemError );
+  navigator.requestMIDIAccess( onMIDIStarted, onMIDISystemError );
 
 });

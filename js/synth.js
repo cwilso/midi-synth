@@ -1,5 +1,6 @@
 var voices = new Array();
 var audioContext = null;
+var isIOS = false;	// we have to disable the convolver on iOS for performance reasons.
 
 // This is the "initial patch"
 var currentModWaveform = 0;	// SINE
@@ -632,12 +633,18 @@ function initAudio() {
 	window.addEventListener('keyup', keyUp, false);
 	setupSynthUI();
 
+	isIOS = (navigator.userAgent.indexOf("iPad")!=-1)||(navigator.userAgent.indexOf("iPhone")!=-1);
+
 	// set up the master effects chain for all voices to connect to.
 	effectChain = audioContext.createGainNode();
 	waveshaper = new WaveShaper( audioContext );
     effectChain.connect( waveshaper.input );
     onUpdateDrive( currentDrive );
-    revNode = audioContext.createConvolver();
+
+    if (!isIOS)
+    	revNode = audioContext.createConvolver();
+    else
+    	revNode = audioContext.createGainNode();
 	revGain = audioContext.createGainNode();
 	revBypassGain = audioContext.createGainNode();
 
@@ -653,15 +660,16 @@ function initAudio() {
     volNode.connect( audioContext.destination );
     onUpdateVolume( currentVol );
 
-  	var irRRequest = new XMLHttpRequest();
-	irRRequest.open("GET", "sounds/irRoom.wav", true);
-	irRRequest.responseType = "arraybuffer";
-	irRRequest.onload = function() {
-  		audioContext.decodeAudioData( irRRequest.response, 
-  			function(buffer) { if (revNode) revNode.buffer = buffer; else console.log("no revNode ready!")} );
+    if (!isIOS) {
+	  	var irRRequest = new XMLHttpRequest();
+		irRRequest.open("GET", "sounds/irRoom.wav", true);
+		irRRequest.responseType = "arraybuffer";
+		irRRequest.onload = function() {
+	  		audioContext.decodeAudioData( irRRequest.response, 
+	  			function(buffer) { if (revNode) revNode.buffer = buffer; else console.log("no revNode ready!")} );
+		}
+		irRRequest.send();
 	}
-	irRRequest.send();
-
 
 }
 
