@@ -450,8 +450,8 @@ function Voice( note, velocity ) {
 	this.modFilterGain = audioContext.createGainNode();
 	this.modOsc.connect( this.modFilterGain );
 	this.modFilterGain.gain.value = currentFilterMod*10;
-	this.modFilterGain.connect( this.filter1.frequency );	// filter tremolo
-	this.modFilterGain.connect( this.filter2.frequency );	// filter tremolo
+	this.modFilterGain.connect( this.filter1.detune );	// filter tremolo
+	this.modFilterGain.connect( this.filter2.detune );	// filter tremolo
 
 	// create the volume envelope
 	this.envelope = audioContext.createGainNode();
