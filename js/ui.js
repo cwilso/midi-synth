@@ -83,42 +83,42 @@ function setupSynthUI() {
 	mod.appendChild( createKnob( "modOsc2", "osc2 tremolo", 80, 12, 255, 0, 100, currentModOsc2, "#c10087", onUpdateModOsc2 ) );
 	synthBox.appendChild( mod );
 
-	var osc1 = createSection( "OSC1", 130, 10, 240, 160 );	
+	var osc1 = createSection( "OSC1", 130, 10, 223, 160 );	
 	osc1.appendChild( createDropdown( "osc1wave", "waveform", 10, 15, ["sine","square", "saw", "triangle"/*, "wavetable"*/], currentOsc1Waveform, onUpdateOsc1Wave ))
-	osc1.appendChild( createDropdown( "osc1int", "interval",             160, 15, ["32'","16'", "8'"], currentOsc1Octave, onUpdateOsc1Octave ) );
+	osc1.appendChild( createDropdown( "osc1int", "interval",  140, 15, ["32'","16'", "8'"], currentOsc1Octave, onUpdateOsc1Octave ) );
 	osc1.appendChild( createKnob(     "osc1detune", "detune", 100, 10, 65, -1200, 1200, currentOsc1Detune, "blue", onUpdateOsc1Detune ) );
 	osc1.appendChild( createKnob(     "osc1mix", "mix",       100, 130, 65, 0, 100, currentOsc1Mix, "blue", onUpdateOsc1Mix ) );
 	synthBox.appendChild( osc1 );
 
-	var osc2 = createSection( "OSC2", 130, 192, 240, 160 );	
+	var osc2 = createSection( "OSC2", 130, 192, 223, 160 );	
 	osc2.appendChild( createDropdown( "osc2wave", "waveform", 10, 15, ["sine","square", "saw", "triangle"/*, "wavetable"*/], currentOsc2Waveform, onUpdateOsc2Wave ))
-	osc2.appendChild( createDropdown( "osc2int", "interval", 160, 15, ["16'","8'", "4'"], currentOsc2Octave, onUpdateOsc2Octave ) );
+	osc2.appendChild( createDropdown( "osc2int", "interval", 140, 15, ["16'","8'", "4'"], currentOsc2Octave, onUpdateOsc2Octave ) );
 	osc2.appendChild( createKnob( "osc2detune", "detune", 100, 10, 65, -1200, 1200, currentOsc2Detune, "blue", onUpdateOsc2Detune ) );
 	osc2.appendChild( createKnob( "osc2mix", "mix", 100, 130, 65, 0, 100, currentOsc2Mix, "blue", onUpdateOsc2Mix ) );
 	synthBox.appendChild( osc2 );
 
-	var filter = createSection( "filter", 404, 10, 80, 342 );	
+	var filter = createSection( "filter", 387, 10, 80, 342 );	
 	filter.appendChild( createKnob( "fFreq", "cutoff", 75, 12, 15, 0, 100, currentFilterCutoff, "#ffaa00", onUpdateFilterCutoff ) );
 	filter.appendChild( createKnob( "fQ", "q",       75, 12, 100, 0, 20, currentFilterQ, "#ffaa00", onUpdateFilterQ ) );
 	filter.appendChild( createKnob( "fMod", "mod",   75, 12, 185, 0, 100, currentFilterMod, "#ffaa00", onUpdateFilterMod ) );
 	filter.appendChild( createKnob( "fEnv", "env",   75, 12, 270, 0, 100, currentFilterEnv, "#ffaa00", onUpdateFilterEnv ) );
 	synthBox.appendChild( filter );
 
-	var filterEnv = createSection( "filter envelope", 518, 10, 355, 98 );	
+	var filterEnv = createSection( "filter envelope", 501, 10, 355, 98 );	
 	filterEnv.appendChild( createKnob( "fA", "attack",  80,   10, 20, 0, 100, currentFilterEnvA, "#bf8f30", onUpdateFilterEnvA ) );
 	filterEnv.appendChild( createKnob( "fD", "decay",   80,  100, 20, 0, 100, currentFilterEnvD, "#bf8f30", onUpdateFilterEnvD ) );
 	filterEnv.appendChild( createKnob( "fS", "sustain", 80,  190, 20, 0, 100, currentFilterEnvS, "#bf8f30", onUpdateFilterEnvS ) );
 	filterEnv.appendChild( createKnob( "fR", "release", 80,  280, 20, 0, 100, currentFilterEnvR, "#bf8f30", onUpdateFilterEnvR ) );
 	synthBox.appendChild( filterEnv );
 
-	var volumeEnv = createSection( "volume envelope", 518, 131, 355, 98 );	
+	var volumeEnv = createSection( "volume envelope", 501, 131, 355, 98 );	
 	volumeEnv.appendChild( createKnob( "vA", "attack",  80,   10, 20, 0, 100, currentEnvA, "#00b358", onUpdateEnvA ) );
 	volumeEnv.appendChild( createKnob( "vD", "decay",   80,  100, 20, 0, 100, currentEnvD, "#00b358", onUpdateEnvD ) );
 	volumeEnv.appendChild( createKnob( "vS", "sustain", 80,  190, 20, 0, 100, currentEnvS, "#00b358", onUpdateEnvS ) );
 	volumeEnv.appendChild( createKnob( "vR", "release", 80,  280, 20, 0, 100, currentEnvR, "#00b358", onUpdateEnvR ) );
 	synthBox.appendChild( volumeEnv );
 
-	var master = createSection( "master", 518, 254, 355, 98 );	
+	var master = createSection( "master", 501, 254, 355, 98 );	
 	master.appendChild( createKnob( "drive", "drive",    80,   10, 20, 0, 100, currentDrive, "yellow", onUpdateDrive ) );
 	master.appendChild( createKnob( "reverb", "reverb",     80,  100, 20, 0, 100, currentRev, "yellow", onUpdateReverb ) );
 	master.appendChild( createKnob( "volume", "volume",     80,  190, 20, 0, 100, currentVol, "yellow", onUpdateVolume ) );
