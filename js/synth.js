@@ -4,37 +4,37 @@ var isIOS = false;	// we have to disable the convolver on iOS for performance re
 
 // This is the "initial patch"
 var currentModWaveform = 0;	// SINE
-var currentModFrequency = 22; // Hz * 10 = 2.2
-var currentModOsc1 = 11;
-var currentModOsc2 = 0;
+var currentModFrequency = 21; // Hz * 10 = 2.1
+var currentModOsc1 = 15;
+var currentModOsc2 = 17;
 
 var currentOsc1Waveform = 2; // SAW
-var currentOsc1Octave = 1;  // 16'
+var currentOsc1Octave = 0;  // 32'
 var currentOsc1Detune = 0;	// 0
 var currentOsc1Mix = 50.0;	// 50%
 
 var currentOsc2Waveform = 2; // SAW
-var currentOsc2Octave = 1;  // 8'
-var currentOsc2Detune = 15;	// slight detune makes pretty analogue-y sound.  :)
+var currentOsc2Octave = 0;  // 16'
+var currentOsc2Detune = -25;	// fat detune makes pretty analogue-y sound.  :)
 var currentOsc2Mix = 50.0;	// 0%
 
-var currentFilterCutoff = 67.0;
-var currentFilterQ = 5.0;
-var currentFilterMod = 10;
-var currentFilterEnv = 67;
+var currentFilterCutoff = 19.0;
+var currentFilterQ = 7.0;
+var currentFilterMod = 21;
+var currentFilterEnv = 56;
 
-var currentEnvA = 7;
+var currentEnvA = 2;
 var currentEnvD = 15;
-var currentEnvS = 75;
-var currentEnvR = 20;
+var currentEnvS = 68;
+var currentEnvR = 5;
 
-var currentFilterEnvA = 25;
-var currentFilterEnvD = 15;
-var currentFilterEnvS = 50;
-var currentFilterEnvR = 40;
+var currentFilterEnvA = 5;
+var currentFilterEnvD = 6;
+var currentFilterEnvS = 5;
+var currentFilterEnvR = 7;
 
-var currentDrive = 10;
-var currentRev = 25;
+var currentDrive = 38;
+var currentRev = 32;
 var currentVol = 75;
 // end initial patch
 
@@ -460,8 +460,7 @@ function Voice( note, velocity ) {
 
 	// set up the volume and filter envelopes
 	var now = audioContext.currentTime;
-	var filterAttackEnd = now + (currentFilterEnvA/200.0);
-	var envAttackEnd = now + (currentEnvA/10.0);
+	var envAttackEnd = now + (currentEnvA/20.0);
 
 	this.envelope.gain.value = 0.0;
 	this.envelope.gain.setValueAtTime( 0.0, now );
@@ -558,6 +557,7 @@ Voice.prototype.noteOff = function() {
 	var release = now + (currentEnvR/10.0);	
     var initFilter = filterFrequencyFromCutoff( this.originalFrequency, currentFilterCutoff/100 * (1.0-(currentFilterEnv/100.0)) );
 
+//    console.log("noteoff: now: " + now + " val: " + this.filter1.frequency.value + " initF: " + initFilter + " fR: " + currentFilterEnvR/100 );
 	this.envelope.gain.cancelScheduledValues(now);
 	this.envelope.gain.setValueAtTime( this.envelope.gain.value, now );  // this is necessary because of the linear ramp
 	this.envelope.gain.setTargetValueAtTime(0.0, now, (currentEnvR/100));
