@@ -28,6 +28,8 @@ function selectMIDIIn( ev ) {
 }
 
 function onMIDIStarted( midi ) {
+  var preferredIndex = -1;
+
   midiAccess = midi;
 
   document.getElementById("synthbox").className = "loaded";
@@ -38,11 +40,19 @@ function onMIDIStarted( midi ) {
   // clear the MIDI input select
   selectMIDI.options.length = 0;
 
+  for (var i=0; (i<list.length)&&(preferredIndex==-1); i++) {
+    var str=list[i].name.toString();
+    if ((str.indexOf("Keyboard") != -1)||(str.indexOf("keyboard") != -1)||(str.indexOf("KEYBOARD") != -1))
+      preferredIndex=i;
+  }
+  if (preferredIndex==-1)
+    preferredIndex=0;
+
   if (list.length) {
     for (var i=0; i<list.length; i++) {
-      selectMIDI.options[i]=new Option(list[i].name,list[i].fingerprint,i==0,i==0);
+      selectMIDI.options[i]=new Option(list[i].name,list[i].fingerprint,i==preferredIndex,i==preferredIndex);
     }
-    midiIn = midiAccess.getInput( list[0] );
+    midiIn = midiAccess.getInput( list[preferredIndex] );
     midiIn.onmessage = midiMessageReceived;
 
     selectMIDI.onchange = selectMIDIIn;
