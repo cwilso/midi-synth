@@ -169,9 +169,10 @@ function onUpdateModFrequency( value ) {
 	if (value.currentTarget)
 		value = value.currentTarget.value;
 	currentModFrequency = value;
+	var oscFreq = currentModFrequency * modOscFreqMultiplier;
 	for (var i=0; i<255; i++) {
 		if (voices[i] != null) {
-			voices[i].updateModFrequency( currentModFrequency );
+			voices[i].updateModFrequency( oscFreq );
 		}
 	}
 }
@@ -422,7 +423,7 @@ function Voice( note, velocity ) {
 	// create modulator osc
 	this.modOsc = audioContext.createOscillator();
 	this.modOsc.type = currentModWaveform;
-	this.modOsc.frequency.value = currentModFrequency/10;
+	this.modOsc.frequency.value = currentModFrequency/10 * modOscFreqMultiplier;
 
 	this.modOsc1Gain = audioContext.createGainNode();
 	this.modOsc.connect( this.modOsc1Gain );
@@ -573,8 +574,24 @@ Voice.prototype.noteOff = function() {
 }
 
 var currentOctave = 3;
+var modOscFreqMultiplier = 1;
+var moDouble = false;
+var moQuadruple = false;
+
+function changeModMultiplier() {
+	modOscFreqMultiplier = (moDouble?2:1)*(moQuadruple?4:1);
+	onUpdateModFrequency( currentModFrequency );
+}
 
 function keyDown( ev ) {
+	if ((ev.keyCode==49)||(ev.keyCode==50)) {
+		if (ev.keyCode==49)
+			moDouble = true;
+		else if (ev.keyCode==50)
+			moQuadruple = true;
+		changeModMultiplier();
+	}
+
 	var note = keys[ev.keyCode];
 	if (note)
 		noteOn( note + 12*(3-currentOctave), 0.75 );
@@ -587,6 +604,14 @@ function keyDown( ev ) {
 }
 
 function keyUp( ev ) {
+	if ((ev.keyCode==49)||(ev.keyCode==50)) {
+		if (ev.keyCode==49)
+			moDouble = false;
+		else if (ev.keyCode==50)
+			moQuadruple = false;
+		changeModMultiplier();
+	}
+
 	var note = keys[ev.keyCode];
 	if (note)
 		noteOff( note + 12*(3-currentOctave) );
