@@ -118,25 +118,31 @@ function controller( number, value ) {
     $("#reverb").trigger('change');
     onUpdateReverb( currentRev );
   } else if (number == 5) {
-    currentModFrequency = 100 * value;
-    $("#mFreq").val( currentModFrequency );
-    $("#mFreq").trigger('change');
-    onUpdateModFrequency( currentModFrequency );
-  } else if (number == 6) {
     currentModOsc1 = 100 * value;
     $("#modOsc1").val( currentModOsc1 );
     $("#modOsc1").trigger('change');
     onUpdateModOsc1( currentModOsc1 );
-  } else if (number == 7) {
+  } else if (number == 6) {
     currentModOsc2 = 100 * value;
     $("#modOsc2").val( currentModOsc2 );
     $("#modOsc2").trigger('change');
     onUpdateModOsc2( currentModOsc2 );
+  } else if (number == 7) {
+    currentModFrequency = 100 * value;
+    $("#mFreq").val( currentModFrequency );
+    $("#mFreq").trigger('change');
+    onUpdateModFrequency( currentModFrequency );
   } else if (number == 8) {
     currentVol = 100 * value;
     $("#volume").val( currentVol );
     $("#volume").trigger('change');
     onUpdateVolume( currentVol );
+  } else if (number == 0x33) { // "1" button
+	moDouble = (value > 0);
+	changeModMultiplier();
+  } else if (number == 0x34) { // "2" button
+	moQuadruple = (value > 0);
+	changeModMultiplier();
   }
 }
 
