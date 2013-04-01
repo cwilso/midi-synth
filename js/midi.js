@@ -4,6 +4,8 @@ function midiMessageReceived( ev ) {
   var noteNumber = ev.data[1];
   var velocity = ev.data[2];
 
+  if (channel == 9)
+    return
   if ( cmd==8 || ((cmd==9)&&(velocity==0)) ) { // with MIDI, note on with velocity zero is the same as note off
     // note off
     noteOff( noteNumber );
