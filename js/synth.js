@@ -102,27 +102,27 @@ function controller( number, value ) {
     $("#fFreq").trigger('change');
     onUpdateFilterCutoff( currentFilterCutoff );
     return;
-  } else if (number == 2) {
+  } else if (number == 0x0a) {
     currentFilterQ = 20 * value;
     $("#fQ").val( currentFilterQ );
     $("#fQ").trigger('change');
     onUpdateFilterQ( currentFilterQ );
-  } else if (number == 3) {
+  } else if (number == 0x49) {
     currentDrive = 100 * value;
     $("#drive").val( currentDrive );
     $("#drive").trigger('change');
     onUpdateDrive( currentDrive );
-  } else if (number == 4) {
+  } else if (number == 0x48) {
     currentRev = 100 * value;
     $("#reverb").val( currentRev );
     $("#reverb").trigger('change');
     onUpdateReverb( currentRev );
-  } else if (number == 5) {
+  } else if (number == 0x4a) {
     currentModOsc1 = 100 * value;
     $("#modOsc1").val( currentModOsc1 );
     $("#modOsc1").trigger('change');
     onUpdateModOsc1( currentModOsc1 );
-  } else if (number == 6) {
+  } else if (number == 0x47) {
     currentModOsc2 = 100 * value;
     $("#modOsc2").val( currentModOsc2 );
     $("#modOsc2").trigger('change');
@@ -132,7 +132,7 @@ function controller( number, value ) {
     $("#mFreq").val( currentModFrequency );
     $("#mFreq").trigger('change');
     onUpdateModFrequency( currentModFrequency );
-  } else if (number == 8) {
+  } else if (number == 0x5b) {
     currentVol = 100 * value;
     $("#volume").val( currentVol );
     $("#volume").trigger('change');
