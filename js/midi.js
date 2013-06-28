@@ -25,8 +25,8 @@ var midiAccess = null;
 var midiIn = null;
 
 function selectMIDIIn( ev ) {
-  midiIn = midiAccess.getInput( selectMIDI.selectedIndex );
-  midiIn.onmessage = midiMessageReceived;
+  midiIn = midiAccess.inputs()[ selectMIDI.selectedIndex ];
+  midiIn.onmidimessage = midiMessageReceived;
 }
 
 function onMIDIStarted( midi ) {
@@ -37,7 +37,7 @@ function onMIDIStarted( midi ) {
   document.getElementById("synthbox").className = "loaded";
 
   selectMIDI=document.getElementById("midiIn");
-  var list=midiAccess.getInputs();
+  var list=midiAccess.inputs();
 
   // clear the MIDI input select
   selectMIDI.options.length = 0;
@@ -54,8 +54,8 @@ function onMIDIStarted( midi ) {
     for (var i=0; i<list.length; i++) {
       selectMIDI.options[i]=new Option(list[i].name,list[i].fingerprint,i==preferredIndex,i==preferredIndex);
     }
-    midiIn = midiAccess.getInput( list[preferredIndex] );
-    midiIn.onmessage = midiMessageReceived;
+    midiIn = list[preferredIndex];
+    midiIn.onmidimessage = midiMessageReceived;
 
     selectMIDI.onchange = selectMIDIIn;
   }
@@ -68,6 +68,6 @@ function onMIDISystemError( err ) {
 
 //init: start up MIDI
 window.addEventListener('load', function() {   
-  navigator.requestMIDIAccess( onMIDIStarted, onMIDISystemError );
+  navigator.requestMIDIAccess().then( onMIDIStarted, onMIDISystemError );
 
 });
