@@ -54,7 +54,7 @@ function onMIDIStarted( midi ) {
     for (var i=0; i<list.length; i++) {
       selectMIDI.options[i]=new Option(list[i].name,list[i].fingerprint,i==preferredIndex,i==preferredIndex);
     }
-    midiIn = midiAccess.inputs()[selectMIDI.selectedIndex];
+    midiIn = list[preferredIndex];
     midiIn.onmidimessage = midiMessageReceived;
 
     selectMIDI.onchange = selectMIDIIn;
