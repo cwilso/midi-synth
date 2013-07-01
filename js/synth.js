@@ -412,7 +412,7 @@ function Voice( note, velocity ) {
 	this.updateOsc1Frequency();
 	this.osc1.type = currentOsc1Waveform;
 
-	this.osc1Gain = audioContext.createGainNode();
+	this.osc1Gain = audioContext.createGain();
 	this.osc1Gain.gain.value = 0.005 * currentOsc1Mix;
 //	this.gain.gain.value = 0.05 + (0.33 * velocity);
 	this.osc1.connect( this.osc1Gain );
@@ -422,7 +422,7 @@ function Voice( note, velocity ) {
 	this.updateOsc2Frequency();
 	this.osc2.type = currentOsc2Waveform;
 
-	this.osc2Gain = audioContext.createGainNode();
+	this.osc2Gain = audioContext.createGain();
 	this.osc2Gain.gain.value = 0.005 * currentOsc2Mix;
 	this.osc2.connect( this.osc2Gain );
 
@@ -431,12 +431,12 @@ function Voice( note, velocity ) {
 	this.modOsc.type = currentModWaveform;
 	this.modOsc.frequency.value = currentModFrequency/10 * modOscFreqMultiplier;
 
-	this.modOsc1Gain = audioContext.createGainNode();
+	this.modOsc1Gain = audioContext.createGain();
 	this.modOsc.connect( this.modOsc1Gain );
 	this.modOsc1Gain.gain.value = currentModOsc1/10;
 	this.modOsc1Gain.connect( this.osc1.frequency );	// tremolo
 
-	this.modOsc2Gain = audioContext.createGainNode();
+	this.modOsc2Gain = audioContext.createGain();
 	this.modOsc.connect( this.modOsc2Gain );
 	this.modOsc2Gain.gain.value = currentModOsc2/10;
 	this.modOsc2Gain.connect( this.osc2.frequency );	// tremolo
@@ -454,14 +454,14 @@ function Voice( note, velocity ) {
 	this.filter1.connect( this.filter2 );
 
 	// connect the modulator to the filters
-	this.modFilterGain = audioContext.createGainNode();
+	this.modFilterGain = audioContext.createGain();
 	this.modOsc.connect( this.modFilterGain );
 	this.modFilterGain.gain.value = currentFilterMod*10;
 	this.modFilterGain.connect( this.filter1.detune );	// filter tremolo
 	this.modFilterGain.connect( this.filter2.detune );	// filter tremolo
 
 	// create the volume envelope
-	this.envelope = audioContext.createGainNode();
+	this.envelope = audioContext.createGain();
 	this.filter2.connect( this.envelope );
 	this.envelope.connect( effectChain );
 
@@ -493,9 +493,9 @@ function Voice( note, velocity ) {
 	this.filter2.frequency.linearRampToValueAtTime( filterAttackLevel, filterAttackEnd );
 	this.filter2.frequency.setTargetValueAtTime( filterSustainLevel, filterAttackEnd, (currentFilterEnvD/100.0) );
 
-	this.osc1.noteOn(0);
-	this.osc2.noteOn(0);
-	this.modOsc.noteOn(0);
+	this.osc1.start(0);
+	this.osc2.start(0);
+	this.modOsc.start(0);
 }
 
 
@@ -575,8 +575,8 @@ Voice.prototype.noteOff = function() {
 	this.filter2.frequency.setValueAtTime( this.filter2.frequency.value, now );  // this is necessary because of the linear ramp
 	this.filter2.frequency.setTargetValueAtTime( initFilter, now, (currentFilterEnvR/100.0) );
 
-	this.osc1.noteOff( release );
-	this.osc2.noteOff( release );
+	this.osc1.stop( release );
+	this.osc2.stop( release );
 }
 
 var currentOctave = 3;
@@ -654,10 +654,10 @@ function onChangeOctave( ev ) {
 
 function initAudio() {
 	try {
-    	audioContext = new webkitAudioContext();
+    	audioContext = new AudioContext();
   	}
   	catch(e) {
-    	alert('Web Audio API is not supported in this browser');
+    	alert('The Web Audio API is apparently not supported in this browser.');
   	}
 
 	window.addEventListener('keydown', keyDown, false);
@@ -667,7 +667,7 @@ function initAudio() {
 	isIOS = (navigator.userAgent.indexOf("iPad")!=-1)||(navigator.userAgent.indexOf("iPhone")!=-1);
 
 	// set up the master effects chain for all voices to connect to.
-	effectChain = audioContext.createGainNode();
+	effectChain = audioContext.createGain();
 	waveshaper = new WaveShaper( audioContext );
     effectChain.connect( waveshaper.input );
     onUpdateDrive( currentDrive );
@@ -675,11 +675,11 @@ function initAudio() {
     if (!isIOS)
     	revNode = audioContext.createConvolver();
     else
-    	revNode = audioContext.createGainNode();
-	revGain = audioContext.createGainNode();
-	revBypassGain = audioContext.createGainNode();
+    	revNode = audioContext.createGain();
+	revGain = audioContext.createGain();
+	revBypassGain = audioContext.createGain();
 
-    volNode = audioContext.createGainNode();
+    volNode = audioContext.createGain();
     volNode.gain.value = currentVol;
     waveshaper.output.connect( revNode );
     waveshaper.output.connect( revBypassGain );

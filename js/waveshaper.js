@@ -100,8 +100,8 @@ function createShaperCurve() {
 function WaveShaper(context) {
     this.context = context;
     var waveshaper = context.createWaveShaper();
-    var preGain = context.createGainNode();
-    var postGain = context.createGainNode();
+    var preGain = context.createGain();
+    var postGain = context.createGain();
     preGain.connect(waveshaper);
     waveshaper.connect(postGain);
     this.input = preGain;
