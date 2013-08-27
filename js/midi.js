@@ -63,7 +63,7 @@ function onMIDIStarted( midi ) {
 
 function onMIDISystemError( err ) {
   document.getElementById("synthbox").className = "error";
-  console.log( "Error encountered:" + err.code );
+  console.log( "MIDI not initialized - error encountered:" + err.code );
 }
 
 //init: start up MIDI

@@ -1,6 +1,6 @@
 var voices = new Array();
 var audioContext = null;
-var isIOS = false;	// we have to disable the convolver on iOS for performance reasons.
+var isMobile = false;	// we have to disable the convolver on mobile for performance reasons.
 
 // This is the "initial patch"
 var currentModWaveform = 0;	// SINE
@@ -664,7 +664,7 @@ function initAudio() {
 	window.addEventListener('keyup', keyUp, false);
 	setupSynthUI();
 
-	isIOS = (navigator.userAgent.indexOf("iPad")!=-1)||(navigator.userAgent.indexOf("iPhone")!=-1);
+	isMobile = (navigator.userAgent.indexOf("Android")!=-1)||(navigator.userAgent.indexOf("iPad")!=-1)||(navigator.userAgent.indexOf("iPhone")!=-1);
 
 	// set up the master effects chain for all voices to connect to.
 	effectChain = audioContext.createGain();
@@ -672,7 +672,7 @@ function initAudio() {
     effectChain.connect( waveshaper.input );
     onUpdateDrive( currentDrive );
 
-    if (!isIOS)
+    if (!isMobile)
     	revNode = audioContext.createConvolver();
     else
     	revNode = audioContext.createGain();
@@ -691,7 +691,7 @@ function initAudio() {
     volNode.connect( audioContext.destination );
     onUpdateVolume( currentVol );
 
-    if (!isIOS) {
+    if (!isMobile) {
 	  	var irRRequest = new XMLHttpRequest();
 		irRRequest.open("GET", "sounds/irRoom.wav", true);
 		irRRequest.responseType = "arraybuffer";
