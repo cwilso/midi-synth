@@ -3,10 +3,30 @@
     #synthbox { 
         position:relative; width: 893px; height: 380px; background: #222222; border: 3px solid blue; border-radius: 10px}
     .loaded#synthbox { border-color: #AAA;}
+/*
+    webaudio-knob { margin-left: 8px;}
+*/
     .error#synthbox { border-color: red;}
     .section { position: absolute; }
-    .knobContainer { position:absolute; width: 100px; height:100px; overflow: visible }
-    .knobLabel { position:absolute; font-weight: bold; left: 0px; top: 85px; width:100px; text-align: center; color: white }
+    .knobContainer { 
+        position:absolute; 
+/*        width: 100px; 
+        height:100px; 
+*/        overflow: visible;
+        display: flex;
+        flex-direction: column;
+        align-items: center
+        ;}
+    .knobLabel {
+    /* 
+        position:absolute; 
+        left: 0px; 
+        top: 85px; 
+        width:100px; 
+        */
+        font-weight: bold; 
+        text-align: center; 
+        color: white }
     .section { color: white; }
     .dropdownContainer { position:absolute; }
     .dropdownLabel { position:absolute; left: 3px; top:0px; font-weight: bold;}

@@ -1,11 +1,16 @@
 var synthBox = null;
 
+function testChange(e) {
+	console.log("test");
+}
+
 function createKnob( id, label, width, x, y, min, max, currentValue, color, onChange ) {
 	var container = document.createElement( "div" );
 	container.className = "knobContainer";
 	container.style.left = "" + x + "px";
 	container.style.top = "" + y + "px";
 
+/*
 	var knob = document.createElement( "input" );
 	knob.className = "knob";
 	knob.id = id;
@@ -19,6 +24,21 @@ function createKnob( id, label, width, x, y, min, max, currentValue, color, onCh
 	knob.setAttribute( "data-angleArc", "250" );
 	knob.setAttribute( "data-fgColor", color );
 
+*/
+	var knob = document.createElement( "webaudio-knob" );
+//	knob.className = "knob";
+	knob.id = id;
+	knob.setAttribute( "value", "" + currentValue );
+	knob.setAttribute( "src", "img/LittlePhatty.png" );
+	knob.setAttribute( "min", ""+min );
+	knob.setAttribute( "max", ""+max );
+	knob.setAttribute( "step", (max-min)/100 );
+	knob.setAttribute( "diameter", "64" );
+	knob.setAttribute( "sprites", "100" );
+	knob.setAttribute( "tooltip", label );
+	knob.onchange = onChange;
+//	knob.setValue( currentValue );
+
 	container.appendChild( knob );
 
 	var labelText = document.createElement( "div" );
@@ -29,7 +49,7 @@ function createKnob( id, label, width, x, y, min, max, currentValue, color, onCh
 
 	container.appendChild( labelText );
 
-	$( knob ).knob({ 'change' : onChange });
+//	$( knob ).knob({ 'change' : onChange });
 
 	return container;
 }
@@ -78,7 +98,7 @@ function setupSynthUI() {
 	
 	var mod = createSection( "mod", 10, 10, 87, 342 );
 	mod.appendChild( createDropdown( "modwave", "shape", 12, 15, ["sine","square", "saw", "triangle"], currentModWaveform, onUpdateModWaveform ))
-	mod.appendChild( createKnob( "mFreq", "freq*10", 80, 12, 65, 0, 100, currentModFrequency, "#c10087", onUpdateModFrequency ) );
+	mod.appendChild( createKnob( "mFreq", "freq*10", 80, 12, 65, 0, 10, currentModFrequency, "#c10087", onUpdateModFrequency ) );
 	mod.appendChild( createKnob( "modOsc1", "osc1 tremolo", 80, 12, 160, 0, 100, currentModOsc1, "#c10087", onUpdateModOsc1 ) );
 	mod.appendChild( createKnob( "modOsc2", "osc2 tremolo", 80, 12, 255, 0, 100, currentModOsc2, "#c10087", onUpdateModOsc2 ) );
 	synthBox.appendChild( mod );

@@ -6,14 +6,18 @@
 	<title>Web Audio MIDI Synthesizer</title>
 	<link href='http://fonts.googleapis.com/css?family=Syncopate:400,700' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" type="text/css" href="styles/main.css">
+    <script src="js/polymer.min.js"></script>
+    <link rel="import" href="webcomponents/controls.html">
 
     <!-- Set up Web MIDI polyfill -->
+<!--
     <script src='http://cwilso.github.com/WebMIDIAPIShim/WebMIDIAPI.js'></script>
+-->
     <!-- Monkey-patch all the audio calls so it works on compliant AudioContext implementations -->
+<!--
     <script src="http://cwilso.github.io/AudioContext-MonkeyPatch/AudioContextMonkeyPatch.js"></script>
+-->
     <script type="text/javascript" src="js/midi.js"></script>
-	<script type="text/javascript" src="js/jquery-1.8.1.min.js"></script>
-	<script type="text/javascript" src="js/jquery.knob.js"></script>
     <script type="text/javascript" src="js/waveshaper.js"></script>
     <script type="text/javascript" src="js/synth.js"></script>
     <script type="text/javascript" src="js/ui.js"></script>
@@ -38,6 +42,7 @@
     <div id="githubnotice"><a href="http://github.com/cwilso/midi-synth">Fork my code on Github</a></div>
     <div id="MIDIPlugin"></div>
 
+<!--
 <script type="text/javascript">
 
   var _gaq = _gaq || [];
@@ -51,5 +56,6 @@
   })();
 
 </script>
+-->
 </body>
 </html>

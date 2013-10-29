@@ -4,7 +4,7 @@ var isMobile = false;	// we have to disable the convolver on mobile for performa
 
 // This is the "initial patch"
 var currentModWaveform = "sine";	// SINE
-var currentModFrequency = 21; // Hz * 10 = 2.1
+var currentModFrequency = 2.1; // Hz * 10 = 2.1
 var currentModOsc1 = 15;
 var currentModOsc2 = 17;
 
@@ -128,7 +128,7 @@ function controller( number, value ) {
     $("#modOsc2").trigger('change');
     onUpdateModOsc2( currentModOsc2 );
   } else if (number == 7) {
-    currentModFrequency = 100 * value;
+    currentModFrequency = 10 * value;
     $("#mFreq").val( currentModFrequency );
     $("#mFreq").trigger('change');
     onUpdateModFrequency( currentModFrequency );
@@ -173,9 +173,8 @@ function onUpdateModWaveform( ev ) {
 	}
 }
 
-function onUpdateModFrequency( value ) {
-	if (value.currentTarget)
-		value = value.currentTarget.value;
+function onUpdateModFrequency( ev ) {
+	var value = ev.currentTarget.value;
 	currentModFrequency = value;
 	var oscFreq = currentModFrequency * modOscFreqMultiplier;
 	for (var i=0; i<255; i++) {
@@ -185,9 +184,8 @@ function onUpdateModFrequency( value ) {
 	}
 }
 
-function onUpdateModOsc1( value ) {
-	if (value.currentTarget)
-		value = value.currentTarget.value;
+function onUpdateModOsc1( ev ) {
+	var value = ev.currentTarget.value;
 	currentModOsc1 = value;
 	for (var i=0; i<255; i++) {
 		if (voices[i] != null) {
@@ -196,9 +194,8 @@ function onUpdateModOsc1( value ) {
 	}
 }
 
-function onUpdateModOsc2( value ) {
-	if (value.currentTarget)
-		value = value.currentTarget.value;
+function onUpdateModOsc2( ev ) {
+	var value = ev.currentTarget.value;
 	currentModOsc2 = value;
 	for (var i=0; i<255; i++) {
 		if (voices[i] != null) {
@@ -207,9 +204,8 @@ function onUpdateModOsc2( value ) {
 	}
 }
 
-function onUpdateFilterCutoff( value ) {
-	if (value.currentTarget)
-		value = value.currentTarget.value;
+function onUpdateFilterCutoff( ev ) {
+	var value = ev.currentTarget.value;
 	currentFilterCutoff = value;
 	for (var i=0; i<255; i++) {
 		if (voices[i] != null) {
@@ -218,9 +214,8 @@ function onUpdateFilterCutoff( value ) {
 	}
 }
 
-function onUpdateFilterQ( value ) {
-	if (value.currentTarget)
-		value = value.currentTarget.value;
+function onUpdateFilterQ( ev ) {
+	var value = ev.currentTarget.value;
 	currentFilterQ = value;
 	for (var i=0; i<255; i++) {
 		if (voices[i] != null) {
@@ -229,9 +224,8 @@ function onUpdateFilterQ( value ) {
 	}
 }
 
-function onUpdateFilterMod( value ) {
-	if (value.currentTarget)
-		value = value.currentTarget.value;
+function onUpdateFilterMod( ev ) {
+	var value = ev.currentTarget.value;
 	currentFilterMod = value;
 	for (var i=0; i<255; i++) {
 		if (voices[i] != null) {
@@ -240,8 +234,8 @@ function onUpdateFilterMod( value ) {
 	}
 }
 
-function onUpdateFilterEnv( value ) {
-	currentFilterEnv = value;
+function onUpdateFilterEnv( ev ) {
+	currentFilterEnv = ev.currentTarget.value;
 }
 
 function onUpdateOsc1Wave( ev ) {
@@ -262,9 +256,8 @@ function onUpdateOsc1Octave( ev ) {
 	}
 }
 
-function onUpdateOsc1Detune( value ) {
-	if (value.currentTarget)
-		value = value.currentTarget.value;
+function onUpdateOsc1Detune( ev ) {
+	var value = ev.currentTarget.value;
 	currentOsc1Detune = value;
 	for (var i=0; i<255; i++) {
 		if (voices[i] != null) {
@@ -302,9 +295,8 @@ function onUpdateOsc2Octave( ev ) {
 	}
 }
 
-function onUpdateOsc2Detune( value ) {
-	if (value.currentTarget)
-		value = value.currentTarget.value;
+function onUpdateOsc2Detune( ev ) {
+	var value = ev.currentTarget.value;
 	currentOsc2Detune = value;
 	for (var i=0; i<255; i++) {
 		if (voices[i] != null) {
@@ -313,9 +305,8 @@ function onUpdateOsc2Detune( value ) {
 	}
 }
 
-function onUpdateOsc2Mix( value ) {
-	if (value.currentTarget)
-		value = value.currentTarget.value;
+function onUpdateOsc2Mix( ev ) {
+	var value = ev.currentTarget.value;
 	currentOsc2Mix = value;
 	for (var i=0; i<255; i++) {
 		if (voices[i] != null) {
@@ -324,36 +315,36 @@ function onUpdateOsc2Mix( value ) {
 	}
 }
 
-function onUpdateEnvA( value ) {
-	currentEnvA = value;
+function onUpdateEnvA( ev ) {
+	currentEnvA = ev.currentTarget.value;
 }
 
-function onUpdateEnvD( value ) {
-	currentEnvD = value;
+function onUpdateEnvD( ev ) {
+	currentEnvD = ev.currentTarget.value;
 }
 
-function onUpdateEnvS( value ) {
-	currentEnvS = value;
+function onUpdateEnvS( ev ) {
+	currentEnvS = ev.currentTarget.value;
 }
 
-function onUpdateEnvR( value ) {
-	currentEnvR = value;
+function onUpdateEnvR( ev ) {
+	currentEnvR = ev.currentTarget.value;
 }
 
-function onUpdateFilterEnvA( value ) {
-	currentFilterEnvA = value;
+function onUpdateFilterEnvA( ev ) {
+	currentFilterEnvA = ev.currentTarget.value;
 }
 
-function onUpdateFilterEnvD( value ) {
-	currentFilterEnvD = value;
+function onUpdateFilterEnvD( ev ) {
+	currentFilterEnvD = ev.currentTarget.value;
 }
 
-function onUpdateFilterEnvS( value ) {
-	currentFilterEnvS = value;
+function onUpdateFilterEnvS( ev ) {
+	currentFilterEnvS = ev.currentTarget.value;
 }
 
-function onUpdateFilterEnvR( value ) {
-	currentFilterEnvR = value;
+function onUpdateFilterEnvR( ev ) {
+	currentFilterEnvR = ev.currentTarget.value;
 }
 
 function onUpdateDrive( value ) {
@@ -361,12 +352,12 @@ function onUpdateDrive( value ) {
     waveshaper.setDrive( 0.01 + (currentDrive*currentDrive/500.0) );
 }
 
-function onUpdateVolume( value ) {
-	volNode.gain.value = value/100.0;
+function onUpdateVolume( ev ) {
+	volNode.gain.value = ev.currentTarget.value/100.0;
 }
 
-function onUpdateReverb( value ) {
-	value = value/100;
+function onUpdateReverb( ev ) {
+	var value = ev.currentTarget.value/100;
 
 	// equal-power crossfade
 	var gain1 = Math.cos(value * 0.5*Math.PI);
@@ -431,7 +422,7 @@ function Voice( note, velocity ) {
 	// create modulator osc
 	this.modOsc = audioContext.createOscillator();
 	this.modOsc.type = currentModWaveform;
-	this.modOsc.frequency.value = currentModFrequency/10 * modOscFreqMultiplier;
+	this.modOsc.frequency.value = currentModFrequency * modOscFreqMultiplier;
 
 	this.modOsc1Gain = audioContext.createGain();
 	this.modOsc.connect( this.modOsc1Gain );
@@ -506,7 +497,7 @@ Voice.prototype.setModWaveform = function( value ) {
 }
 
 Voice.prototype.updateModFrequency = function( value ) {
-	this.modOsc.frequency.value = value/10;
+	this.modOsc.frequency.value = value;
 }
 
 Voice.prototype.updateModOsc1 = function( value ) {
@@ -655,6 +646,7 @@ function onChangeOctave( ev ) {
 
 
 function initAudio() {
+	window.AudioContext = window.AudioContext || window.webkitAudioContext;
 	try {
     	audioContext = new AudioContext();
   	}
@@ -688,10 +680,10 @@ function initAudio() {
     revNode.connect( revGain );
     revGain.connect( volNode );
     revBypassGain.connect( volNode );
-    onUpdateReverb( currentRev );
+    onUpdateReverb( {currentTarget:{value:currentRev}} );
 
     volNode.connect( audioContext.destination );
-    onUpdateVolume( currentVol );
+    onUpdateVolume( {currentTarget:{value:currentVol}} );
 
     if (!isMobile) {
 	  	var irRRequest = new XMLHttpRequest();
