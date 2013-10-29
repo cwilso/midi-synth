@@ -98,7 +98,7 @@ function setupSynthUI() {
 	
 	var mod = createSection( "mod", 10, 10, 87, 342 );
 	mod.appendChild( createDropdown( "modwave", "shape", 12, 15, ["sine","square", "saw", "triangle"], currentModWaveform, onUpdateModWaveform ))
-	mod.appendChild( createKnob( "mFreq", "freq*10", 80, 12, 65, 0, 10, currentModFrequency, "#c10087", onUpdateModFrequency ) );
+	mod.appendChild( createKnob( "mFreq", "freq", 80, 12, 65, 0, 10, currentModFrequency, "#c10087", onUpdateModFrequency ) );
 	mod.appendChild( createKnob( "modOsc1", "osc1 tremolo", 80, 12, 160, 0, 100, currentModOsc1, "#c10087", onUpdateModOsc1 ) );
 	mod.appendChild( createKnob( "modOsc2", "osc2 tremolo", 80, 12, 255, 0, 100, currentModOsc2, "#c10087", onUpdateModOsc2 ) );
 	synthBox.appendChild( mod );

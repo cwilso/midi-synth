@@ -94,56 +94,61 @@ function noteOff( note ) {
 
 }
 
+function $(id) {
+	return document.getElementById(id);
+}
+
 // 'value' is normalized to 0..1.
 function controller( number, value ) {
-  if (number == 1) {
-    currentFilterCutoff = 100 * value;
-    $("#fFreq").val( currentFilterCutoff );
-    $("#fFreq").trigger('change');
-    onUpdateFilterCutoff( currentFilterCutoff );
-    return;
-  } else if (number == 0x0a) {
-    currentFilterQ = 20 * value;
-    $("#fQ").val( currentFilterQ );
-    $("#fQ").trigger('change');
-    onUpdateFilterQ( currentFilterQ );
-  } else if (number == 0x49) {
-    currentDrive = 100 * value;
-    $("#drive").val( currentDrive );
-    $("#drive").trigger('change');
-    onUpdateDrive( currentDrive );
-  } else if (number == 0x48) {
-    currentRev = 100 * value;
-    $("#reverb").val( currentRev );
-    $("#reverb").trigger('change');
-    onUpdateReverb( currentRev );
-  } else if (number == 0x4a) {
-    currentModOsc1 = 100 * value;
-    $("#modOsc1").val( currentModOsc1 );
-    $("#modOsc1").trigger('change');
-    onUpdateModOsc1( currentModOsc1 );
-  } else if (number == 0x47) {
-    currentModOsc2 = 100 * value;
-    $("#modOsc2").val( currentModOsc2 );
-    $("#modOsc2").trigger('change');
-    onUpdateModOsc2( currentModOsc2 );
-  } else if (number == 7) {
-    currentModFrequency = 10 * value;
-    $("#mFreq").val( currentModFrequency );
-    $("#mFreq").trigger('change');
-    onUpdateModFrequency( currentModFrequency );
-  } else if (number == 0x5b) {
-    currentVol = 100 * value;
-    $("#volume").val( currentVol );
-    $("#volume").trigger('change');
-    onUpdateVolume( currentVol );
-  } else if (number == 0x33) { // "1" button
-	moDouble = (value > 0);
-	changeModMultiplier();
-  } else if (number == 0x34) { // "2" button
-	moQuadruple = (value > 0);
-	changeModMultiplier();
-  }
+	switch(number) {
+	case 1:
+		$("fFreq").setValue(100*value);
+		onUpdateFilterCutoff( 100*value );
+		return;
+	case 0x0a:
+	case 2:
+		$("fQ").setValue(20*value);
+		onUpdateFilterQ( 20*value );
+		return;
+	case 3:
+		$("fMod").setValue(100*value);
+		onUpdateFilterMod(100*value);	
+		return;
+	case 0x49:
+	case 5:
+	    $("drive").setValue(100 * value);
+	    onUpdateDrive( 100 * value );
+	    return;
+	case 0x48:
+	case 6:
+	    $("reverb").setValue(100 * value);
+	    onUpdateReverb( 100 * value );
+	    return;
+	case 0x4a:
+	    $("modOsc1").setValue(100 * value);
+	    onUpdateModOsc1( 100 * value );
+	    return;
+	case 0x47:
+	    $("modOsc2").setValue(100 * value);
+	    onUpdateModOsc2( 100 * value );
+	    return;
+	case 4:
+	    $("mFreq").setValue(10 * value);
+	    onUpdateModFrequency( 10 * value );
+	    return;
+	case 0x5b:
+	    $("volume").setValue(100 * value);
+	    onUpdateVolume( 100 * value );
+	    return;
+	case 33: // "x1" button
+		moDouble = (value > 0);
+		changeModMultiplier();
+	    return;
+	case 34: // "x2" button
+		moQuadruple = (value > 0);
+		changeModMultiplier();
+	    return;
+	}
 }
 
 var currentPitchWheel = 0.0;
@@ -174,7 +179,7 @@ function onUpdateModWaveform( ev ) {
 }
 
 function onUpdateModFrequency( ev ) {
-	var value = ev.currentTarget.value;
+	var value = ev.currentTarget ? ev.currentTarget.value : ev;
 	currentModFrequency = value;
 	var oscFreq = currentModFrequency * modOscFreqMultiplier;
 	for (var i=0; i<255; i++) {
@@ -185,7 +190,7 @@ function onUpdateModFrequency( ev ) {
 }
 
 function onUpdateModOsc1( ev ) {
-	var value = ev.currentTarget.value;
+	var value = ev.currentTarget ? ev.currentTarget.value : ev;
 	currentModOsc1 = value;
 	for (var i=0; i<255; i++) {
 		if (voices[i] != null) {
@@ -195,7 +200,7 @@ function onUpdateModOsc1( ev ) {
 }
 
 function onUpdateModOsc2( ev ) {
-	var value = ev.currentTarget.value;
+	var value = ev.currentTarget ? ev.currentTarget.value : ev;
 	currentModOsc2 = value;
 	for (var i=0; i<255; i++) {
 		if (voices[i] != null) {
@@ -205,7 +210,7 @@ function onUpdateModOsc2( ev ) {
 }
 
 function onUpdateFilterCutoff( ev ) {
-	var value = ev.currentTarget.value;
+	var value = ev.currentTarget ? ev.currentTarget.value : ev;
 	currentFilterCutoff = value;
 	for (var i=0; i<255; i++) {
 		if (voices[i] != null) {
@@ -215,7 +220,7 @@ function onUpdateFilterCutoff( ev ) {
 }
 
 function onUpdateFilterQ( ev ) {
-	var value = ev.currentTarget.value;
+	var value = ev.currentTarget ? ev.currentTarget.value : ev;
 	currentFilterQ = value;
 	for (var i=0; i<255; i++) {
 		if (voices[i] != null) {
@@ -225,7 +230,7 @@ function onUpdateFilterQ( ev ) {
 }
 
 function onUpdateFilterMod( ev ) {
-	var value = ev.currentTarget.value;
+	var value = ev.currentTarget ? ev.currentTarget.value : ev;
 	currentFilterMod = value;
 	for (var i=0; i<255; i++) {
 		if (voices[i] != null) {
@@ -235,7 +240,8 @@ function onUpdateFilterMod( ev ) {
 }
 
 function onUpdateFilterEnv( ev ) {
-	currentFilterEnv = ev.currentTarget.value;
+	var value = ev.currentTarget ? ev.currentTarget.value : ev;
+	currentFilterEnv = value;
 }
 
 function onUpdateOsc1Wave( ev ) {
@@ -357,7 +363,8 @@ function onUpdateVolume( ev ) {
 }
 
 function onUpdateReverb( ev ) {
-	var value = ev.currentTarget.value/100;
+	var value = ev.currentTarget ? ev.currentTarget.value : ev;
+	value = value/100;
 
 	// equal-power crossfade
 	var gain1 = Math.cos(value * 0.5*Math.PI);
@@ -449,7 +456,7 @@ function Voice( note, velocity ) {
 	// connect the modulator to the filters
 	this.modFilterGain = audioContext.createGain();
 	this.modOsc.connect( this.modFilterGain );
-	this.modFilterGain.gain.value = currentFilterMod*10;
+	this.modFilterGain.gain.value = currentFilterMod*24;
 	this.modFilterGain.connect( this.filter1.detune );	// filter tremolo
 	this.modFilterGain.connect( this.filter2.detune );	// filter tremolo
 
@@ -549,7 +556,7 @@ Voice.prototype.setFilterQ = function( value ) {
 }
 
 Voice.prototype.setFilterMod = function( value ) {
-	this.modFilterGain.gain.value = currentFilterMod*10;
+	this.modFilterGain.gain.value = currentFilterMod*24;
 }
 
 Voice.prototype.noteOff = function() {
