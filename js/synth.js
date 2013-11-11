@@ -689,7 +689,6 @@ function pointerMove( ev ) {
 		+ " target: " + ev.target.id
 		+ " currentTarget: " + ev.currentTarget.id
 		+ " srcElement: " + ev.srcElement.id
-//		+ " toElement: " + ev.toElement.id 
 		+ " note:" + note );
 	if (!isNaN(note) && pointers[ev.pointerId] && pointers[ev.pointerId]!=note) {
 		if (pointers[ev.pointerId])
