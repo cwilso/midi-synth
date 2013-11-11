@@ -1,4 +1,5 @@
 var synthBox = null;
+var pointerDebugging = false;
 
 function testChange(e) {
 	console.log("test");
@@ -68,8 +69,11 @@ function createDropdown( id, label, x, y, values, selectedIndex, onChange ) {
 	var select = document.createElement( "select" );
 	select.className = "dropdownSelect";
 	select.id = id;
-	for (var i=0; i<values.length; i++)
-		select.options[i] = new Option(values[i]);
+	for (var i=0; i<values.length; i++) {
+		var opt = document.createElement("option");
+		opt.appendChild(document.createTextNode(values[i]));
+		select.appendChild(opt);
+	}
 	select.selectedIndex = selectedIndex;
 	select.onchange = onChange;
 	container.appendChild( select );
@@ -147,25 +151,21 @@ function setupSynthUI() {
 	synthBox.appendChild( master );
 
 	keybox = document.getElementById("keybox");
-/*
-	keybox.addEventListener('touchstart', touchstart);
-	keybox.addEventListener('touchmove', touchmove);
-	keybox.addEventListener('touchend', touchend);
-*/
-	keybox.addEventListener('pointerdown', pointerDown);
-	keybox.addEventListener('pointermove', pointerMove);
-	keybox.addEventListener('pointerup', pointerUp);
 
-/*
-	keybox.addEventListener('pointerover', pointerOver);
-	keybox.addEventListener('pointerout', pointerOut);
-	keybox.addEventListener('pointerenter', pointerEnter);
-	keybox.addEventListener('pointerleave', pointerLeave);
-	keybox.addEventListener('pointercancel', pointerCancel);
-*/
-	var keys = document.querySelectorAll( ".key" );
-	for (var i=0; i<keys.length; i++) {
-//		keys[i].addEventListener('pointerdown', pointerDown);
-//		keys[i].addEventListener('pointerup', pointerUp);
+	if (window.location.search.substring(1) == "touch") {
+		keybox.addEventListener('touchstart', touchstart);
+		keybox.addEventListener('touchmove', touchmove);
+		keybox.addEventListener('touchend', touchend);
+	} else {
+		keybox.addEventListener('pointerdown', pointerDown);
+		keybox.addEventListener('pointermove', pointerMove);
+		keybox.addEventListener('pointerup', pointerUp);
+		keybox.addEventListener('pointerover', pointerOver);
+		keybox.addEventListener('pointerout', pointerOut);
+		keybox.addEventListener('pointerenter', pointerEnter);
+		keybox.addEventListener('pointerleave', pointerLeave);
+		keybox.addEventListener('pointercancel', pointerCancel);
+		if (window.location.search.substring(1) == "dbgptr")
+			pointerDebugging = true;
 	}
 } 

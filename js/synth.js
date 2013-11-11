@@ -674,7 +674,9 @@ function touchcancel( ev ) {
 
 function pointerDown( ev ) {
 	var note = parseInt( ev.target.id.substring( 1 ) );
-	console.log( "pointer down: id: " + ev.pointerId + " note:" + note );
+	if (pointerDebugging)
+		console.log( "pointer down: id: " + ev.pointerId
+			+ " target: " + ev.target.id + " note:" + note );
 	if (!isNaN(note)) {
 		noteOn( note + 12*(3-currentOctave), 0.75 );
 		var keybox = document.getElementById("keybox")
@@ -685,11 +687,9 @@ function pointerDown( ev ) {
 
 function pointerMove( ev ) {
 	var note = parseInt( ev.target.id.substring( 1 ) );
-	console.log( "pointer move: id: " + ev.pointerId 
-		+ " target: " + ev.target.id
-		+ " currentTarget: " + ev.currentTarget.id
-		+ " srcElement: " + ev.srcElement.id
-		+ " note:" + note );
+	if (pointerDebugging)
+		console.log( "pointer move: id: " + ev.pointerId 
+			+ " target: " + ev.target.id + " note:" + note );
 	if (!isNaN(note) && pointers[ev.pointerId] && pointers[ev.pointerId]!=note) {
 		if (pointers[ev.pointerId])
 			noteOff(pointers[ev.pointerId] + 12*(3-currentOctave));
@@ -701,7 +701,8 @@ function pointerMove( ev ) {
 
 function pointerUp( ev ) {
 	var note = parseInt( ev.target.id.substring( 1 ) );
-	console.log( "pointer up: id: " + ev.pointerId + " note:" + note );
+	if (pointerDebugging)
+		console.log( "pointer up: id: " + ev.pointerId + " note:" + note );
 	if (note != NaN)
 		noteOff( note + 12*(3-currentOctave) );
 	pointers[ev.pointerId]=null;
@@ -709,34 +710,36 @@ function pointerUp( ev ) {
 	ev.preventDefault();
 }
 
-
-/*
 function pointerOver( ev ) {
 	var note = parseInt( ev.target.id.substring( 1 ) );
-	console.log( "pointerover: id: " + ev.pointerId + " note:" + note );
+	if (pointerDebugging)
+		console.log( "pointerover: id: " + ev.pointerId + " note:" + note );
 	ev.preventDefault();
 }
 function pointerOut( ev ) {
 	var note = parseInt( ev.target.id.substring( 1 ) );
-	console.log( "pointerout: id: " + ev.pointerId + " note:" + note );
+	if (pointerDebugging)
+		console.log( "pointerout: id: " + ev.pointerId + " note:" + note );
 	ev.preventDefault();
 }
 function pointerEnter( ev ) {
 	var note = parseInt( ev.target.id.substring( 1 ) );
-	console.log( "pointerenter: id: " + ev.pointerId + " note:" + note );
+	if (pointerDebugging)
+		console.log( "pointerenter: id: " + ev.pointerId + " note:" + note );
 	ev.preventDefault();
 }
 function pointerLeave( ev ) {
 	var note = parseInt( ev.target.id.substring( 1 ) );
-	console.log( "pointerleave: id: " + ev.pointerId + " note:" + note );
+	if (pointerDebugging)
+		console.log( "pointerleave: id: " + ev.pointerId + " note:" + note );
 	ev.preventDefault();
 }
 function pointerCancel( ev ) {
 	var note = parseInt( ev.target.id.substring( 1 ) );
-	console.log( "pointercancel: id: " + ev.pointerId + " note:" + note );
+	if (pointerDebugging)
+		console.log( "pointercancel: id: " + ev.pointerId + " note:" + note );
 	ev.preventDefault();
 }
-*/
 
 function onChangeOctave( ev ) {
 	currentOctave = ev.target.selectedIndex;
