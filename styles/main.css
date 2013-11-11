@@ -32,7 +32,7 @@
     .dropdownLabel { position:absolute; left: 3px; top:0px; font-weight: bold;}
     .dropdownSelect { position:absolute; left: 0px; top:15px; font: 12px 'Syncopate', sans-serif;}
     #keybox {width:910px; margin-left: -7px; text-align: center;}
-    #blackkeys { position: absolute; z-index: 2; padding-left: 10px; margin-left: 41px; width:806px;}
+    #blackkeys { position: absolute; z-index: 2; padding-left: 10px; margin-left: 41px; width:806px; height: 0px;}
     .key { display:inline-block; }
     .black { background: black; width: 40px; height: 150px; margin: 0px 11px; border-bottom-right-radius: 5px; border-bottom-left-radius: 5px; }
     .spacer { display:inline-block; width: 62px; height: 150px; }

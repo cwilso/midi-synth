@@ -146,9 +146,26 @@ function setupSynthUI() {
 	master.appendChild( createDropdown( "kbd_oct", "kbd_oct", 280, 60, ["+3", "+2","+1", "normal", "-1", "-2", "-3"], 3, onChangeOctave ) );
 	synthBox.appendChild( master );
 
+	keybox = document.getElementById("keybox");
+/*
+	keybox.addEventListener('touchstart', touchstart);
+	keybox.addEventListener('touchmove', touchmove);
+	keybox.addEventListener('touchend', touchend);
+*/
+	keybox.addEventListener('pointerdown', pointerDown);
+	keybox.addEventListener('pointermove', pointerMove);
+	keybox.addEventListener('pointerup', pointerUp);
+
+/*
+	keybox.addEventListener('pointerover', pointerOver);
+	keybox.addEventListener('pointerout', pointerOut);
+	keybox.addEventListener('pointerenter', pointerEnter);
+	keybox.addEventListener('pointerleave', pointerLeave);
+	keybox.addEventListener('pointercancel', pointerCancel);
+*/
 	var keys = document.querySelectorAll( ".key" );
 	for (var i=0; i<keys.length; i++) {
-		keys[i].addEventListener('pointerdown', pointerDown);
-		keys[i].addEventListener('pointerup', pointerUp);
+//		keys[i].addEventListener('pointerdown', pointerDown);
+//		keys[i].addEventListener('pointerup', pointerUp);
 	}
 } 
