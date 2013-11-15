@@ -101,7 +101,7 @@ function $(id) {
 // 'value' is normalized to 0..1.
 function controller( number, value ) {
 	switch(number) {
-	case 1:
+	case 7:
 		$("fFreq").setValue(100*value);
 		onUpdateFilterCutoff( 100*value );
 		return;
@@ -110,7 +110,7 @@ function controller( number, value ) {
 		$("fQ").setValue(20*value);
 		onUpdateFilterQ( 20*value );
 		return;
-	case 3:
+	case 1:
 		$("fMod").setValue(100*value);
 		onUpdateFilterMod(100*value);	
 		return;
@@ -141,10 +141,12 @@ function controller( number, value ) {
 	    onUpdateVolume( 100 * value );
 	    return;
 	case 33: // "x1" button
+	case 51:
 		moDouble = (value > 0);
 		changeModMultiplier();
 	    return;
 	case 34: // "x2" button
+	case 52:
 		moQuadruple = (value > 0);
 		changeModMultiplier();
 	    return;
@@ -359,11 +361,11 @@ function onUpdateDrive( value ) {
 }
 
 function onUpdateVolume( ev ) {
-	volNode.gain.value = ev.currentTarget.value/100.0;
+	volNode.gain.value = (ev.currentTarget ? ev.currentTarget.value : ev)/100;
 }
 
 function onUpdateReverb( ev ) {
-	var value = ev.currentTarget ? ev.currentTarget.value : ev;
+	var value = ev.cxurrentTarget ? ev.currentTarget.value : ev;
 	value = value/100;
 
 	// equal-power crossfade
@@ -482,8 +484,8 @@ function Voice( note, velocity ) {
 		((currentFilterEnv/120) * (currentFilterEnvS/100.0)) );
 	var filterAttackEnd = now + (currentFilterEnvA/20.0);
 
-//	console.log( "pitchFrequency: " + pitchFrequency + " filterInitLevel: " + filterInitLevel + 
-//				 " filterAttackLevel: " + filterAttackLevel + " filterSustainLevel: " + filterSustainLevel );
+	console.log( "pitchFrequency: " + pitchFrequency + " filterInitLevel: " + filterInitLevel + 
+				 " filterAttackLevel: " + filterAttackLevel + " filterSustainLevel: " + filterSustainLevel );
 	this.filter1.frequency.value = filterInitLevel;
 	this.filter1.frequency.setValueAtTime( filterInitLevel, now );
 	this.filter1.frequency.linearRampToValueAtTime( filterAttackLevel, filterAttackEnd );
