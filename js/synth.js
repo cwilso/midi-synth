@@ -3,17 +3,17 @@ var audioContext = null;
 var isMobile = false;	// we have to disable the convolver on mobile for performance reasons.
 
 // This is the "initial patch"
-var currentModWaveform = "sine";	// SINE
+var currentModWaveform = 0;	// SINE
 var currentModFrequency = 2.1; // Hz * 10 = 2.1
 var currentModOsc1 = 15;
 var currentModOsc2 = 17;
 
-var currentOsc1Waveform = "sawtooth"; // SAW
+var currentOsc1Waveform = 2; // SAW
 var currentOsc1Octave = 0;  // 32'
 var currentOsc1Detune = 0;	// 0
 var currentOsc1Mix = 50.0;	// 50%
 
-var currentOsc2Waveform = "sawtooth"; // SAW
+var currentOsc2Waveform = 2; // SAW
 var currentOsc2Octave = 0;  // 16'
 var currentOsc2Detune = -25;	// fat detune makes pretty analogue-y sound.  :)
 var currentOsc2Mix = 50.0;	// 0%
@@ -172,10 +172,10 @@ function pitchWheel( value ) {
 var waveforms = ["sine","square","sawtooth","triangle"];
 
 function onUpdateModWaveform( ev ) {
-	currentModWaveform = waveforms[ev.target.selectedIndex];
+	currentModWaveform = ev.target.selectedIndex;
 	for (var i=0; i<255; i++) {
 		if (voices[i] != null) {
-			voices[i].setModWaveform( currentModWaveform );
+			voices[i].setModWaveform( waveforms[currentModWaveform] );
 		}
 	}
 }
@@ -247,10 +247,10 @@ function onUpdateFilterEnv( ev ) {
 }
 
 function onUpdateOsc1Wave( ev ) {
-	currentOsc1Waveform = waveforms[ev.target.selectedIndex];
+	currentOsc1Waveform = ev.target.selectedIndex;
 	for (var i=0; i<255; i++) {
 		if (voices[i] != null) {
-			voices[i].setOsc1Waveform( currentOsc1Waveform );
+			voices[i].setOsc1Waveform( waveforms[currentOsc1Waveform] );
 		}
 	}
 }
@@ -286,10 +286,10 @@ function onUpdateOsc1Mix( value ) {
 }
 
 function onUpdateOsc2Wave( ev ) {
-	currentOsc2Waveform = waveforms[ev.target.selectedIndex];
+	currentOsc2Waveform = ev.target.selectedIndex;
 	for (var i=0; i<255; i++) {
 		if (voices[i] != null) {
-			voices[i].setOsc2Waveform( currentOsc2Waveform );
+			voices[i].setOsc2Waveform( waveforms[currentOsc2Waveform] );
 		}
 	}
 }
@@ -412,7 +412,7 @@ function Voice( note, velocity ) {
 	// create osc 1
 	this.osc1 = audioContext.createOscillator();
 	this.updateOsc1Frequency();
-	this.osc1.type = currentOsc1Waveform;
+	this.osc1.type = waveforms[currentOsc1Waveform];
 
 	this.osc1Gain = audioContext.createGain();
 	this.osc1Gain.gain.value = 0.005 * currentOsc1Mix;
@@ -422,7 +422,7 @@ function Voice( note, velocity ) {
 	// create osc 2
 	this.osc2 = audioContext.createOscillator();
 	this.updateOsc2Frequency();
-	this.osc2.type = currentOsc2Waveform;
+	this.osc2.type = waveforms[currentOsc2Waveform];
 
 	this.osc2Gain = audioContext.createGain();
 	this.osc2Gain.gain.value = 0.005 * currentOsc2Mix;
@@ -430,7 +430,7 @@ function Voice( note, velocity ) {
 
 	// create modulator osc
 	this.modOsc = audioContext.createOscillator();
-	this.modOsc.type = currentModWaveform;
+	this.modOsc.type = 	waveforms[currentModWaveform];
 	this.modOsc.frequency.value = currentModFrequency * modOscFreqMultiplier;
 
 	this.modOsc1Gain = audioContext.createGain();
