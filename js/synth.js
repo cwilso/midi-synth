@@ -365,7 +365,7 @@ function onUpdateVolume( ev ) {
 }
 
 function onUpdateReverb( ev ) {
-	var value = ev.cxurrentTarget ? ev.currentTarget.value : ev;
+	var value = ev.currentTarget ? ev.currentTarget.value : ev;
 	value = value/100;
 
 	// equal-power crossfade
@@ -484,9 +484,10 @@ function Voice( note, velocity ) {
 		((currentFilterEnv/120) * (currentFilterEnvS/100.0)) );
 	var filterAttackEnd = now + (currentFilterEnvA/20.0);
 
+/*
 	console.log( "pitchFrequency: " + pitchFrequency + " filterInitLevel: " + filterInitLevel + 
 				 " filterAttackLevel: " + filterAttackLevel + " filterSustainLevel: " + filterSustainLevel );
-	this.filter1.frequency.value = filterInitLevel;
+*/	this.filter1.frequency.value = filterInitLevel;
 	this.filter1.frequency.setValueAtTime( filterInitLevel, now );
 	this.filter1.frequency.linearRampToValueAtTime( filterAttackLevel, filterAttackEnd );
 	this.filter1.frequency.setTargetAtTime( filterSustainLevel, filterAttackEnd, (currentFilterEnvD/100.0) );
