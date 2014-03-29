@@ -68,30 +68,49 @@ var revNode = null;
 var revGain = null;
 var revBypassGain = null;
 
+function createMidiMessageEvent(note, velocity) {
+
+    var evt = document.createEvent( "Event" );
+    evt.initEvent( "midimessage", false, false );
+    evt.data = new Uint8Array(3);
+    evt.data[0] = 144; // channel 1
+    evt.data[1] = note;
+    evt.data[2] = velocity || 0;
+
+    if (window.onmidimessage && typeof window.onmidimessage == 'function') {
+        window.onmidimessage( evt );
+    }
+}
+
 function frequencyFromNoteNumber( note ) {
-	return 440 * Math.pow(2,(note-69)/12);
+    return 440 * Math.pow(2,(note-69)/12);
 }
 
 function noteOn( note, velocity ) {
-	if (voices[note] == null) {
-		// Create a new synth node
-		voices[note] = new Voice(note, velocity);
-		var e = document.getElementById( "k" + note );
-		if (e)
-			e.classList.add("pressed");
-	}
+
+    createMidiMessageEvent(note, velocity);
+
+    if (voices[note] == null) {
+        // Create a new synth node
+        voices[note] = new Voice(note, velocity);
+        var e = document.getElementById( "k" + note );
+        if (e)
+            e.classList.add("pressed");
+    }
 }
 
 function noteOff( note ) {
-	if (voices[note] != null) {
-		// Shut off the note playing and clear it 
-		voices[note].noteOff();
-		voices[note] = null;
-		var e = document.getElementById( "k" + note );
-		if (e)
-			e.classList.remove("pressed");
-	}
 
+    createMidiMessageEvent(note);
+
+    if (voices[note] != null) {
+        // Shut off the note playing and clear it
+        voices[note].noteOff();
+        voices[note] = null;
+        var e = document.getElementById( "k" + note );
+        if (e)
+            e.classList.remove("pressed");
+    }
 }
 
 function $(id) {
