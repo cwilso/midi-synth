@@ -52,7 +52,7 @@ function onMIDIStarted( midi ) {
 
   if (list.length) {
     for (var i=0; i<list.length; i++) {
-      selectMIDI.options[i]=new Option(list[i].name,list[i].fingerprint,i==preferredIndex,i==preferredIndex);
+      selectMIDI.appendChild(new Option(list[i].name,list[i].fingerprint,i==preferredIndex,i==preferredIndex));
     }
     midiIn = list[preferredIndex];
     midiIn.onmidimessage = midiMessageReceived;
