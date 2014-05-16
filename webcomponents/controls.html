@@ -131,7 +131,8 @@
 					knb.style.background = 'url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAACg0lEQVR42u2bvW7CMBCAwwswMCB14AUQb8BjsHbKUqljngClW16gUxkYeQXmTrRTXqEjTCiiGYJ7iS5SlAZIgu98wbH0CWTxc3ex785n23Ho2wRYAD6wAXbADxABCRJh3w4/4+N3Jk5H2xwIgBBQdxLib82lKz0EPE1KXzOGh/8lSnEfh3FtZcbAMzJubogI/9O4IV6BQ9MnOQW+gWgwyPgCpu1GxAFlYG8zYNt2KL+Bwkd4PSNH7LtjamxRJpbmouduLfAKiAGFxNh3p39IUDbSFuhwZkQGyAmolF/r8uapsr8w5HMDpO9XeqPFWrfyG53h7AMUjgs+IMY+zSFzI+7JV02Bs/4poHUkBARCUfsAbT7BpcroilNA0U2BIm6bOJ9QCVSeAgROsCpENsoTtoTCZE+7HAWIR0CeLNVObxW1ARiiQBU30+Zhm9xecBSoWjtcXUD5DEKod+BUGAEn7HN48K89/YhDiBdgXwiDe+xjMkB0aRR4TAKoJ2AJfCJL7HP48KoMEDIKoEbADBnxKp9Xlv7V8JRlzMlTXuEExoa/EMJi3V5ZSrbvsLDYAAu25EcovvZqT8fIqkY7iw2Q6p5tStpqgFR3nvxfKKnudJWfDpD0BuinQO8E+zBofSJkfSps/WLI+uWw9QWRviTWF0Xtmwah0Y0RAXhGt8YE5P9Do5ujEpIfo9vjBrm5Pc5yQMIgtc8Vbx9Q+dpHZMgPSRmq/DQ+TO0+kAFaH6IOHi3lFXFUlhFth6a7WDXSdli6iyNB+3H5LvkEsgsTxeiQCA115FdminmCpGSJ9dJUOW02uXYwdm2uvIBqfHFSw5JWxMXJsiGsvDpb1ay8PH2pib4+/wcnUdJ/bu6siQAAAABJRU5ErkJggg==)';
 					this.sprites = 0;
 				}
-				knb.style.backgroundSize = '100%'+((this.sprites+1)*100)+'%';
+//				this.$['wac-body'].style.width = this.width+'px';
+				knb.style.backgroundSize = '100% '+((this.sprites+1)*100)+'%';
 				if(this.step && this.step < 1) {
 					for(var n = this.step ; n < 1; n *= 10)
 						++this.digits;
@@ -247,12 +248,14 @@
 				this.showtip();
 				e.preventDefault();
 			},
-			setValue: function(value) {
+			setValue: function(value,fire) {
 				value = parseFloat(value);
 				if(!isNaN(value)) {
 					this.value = value < this.min ? this.min : value > this.max ? this.max : value;
 					this.valuedisp = this.value.toFixed(this.digits);
 				}
+				if(fire)
+					this.fire('change');
 				if(this.value!=this.valueold) {
 					this.redraw();
 					this.valueold = this.value;
@@ -265,11 +268,10 @@
 				if(this.sprites) {
 					var offset = ~~(this.sprites * (this.value - this.min) / range) * this.height;
 					this.$['wac-knob'].style.backgroundPosition= "0px -" + offset + "px";
+					this.$['wac-knob'].style.transform = 'rotate(0deg)';
 				}
 				else {
 					var deg = 270*((this.value-this.min)/range-0.5);
-					this.$['wac-knob'].style.webkitTransform = 'rotate('+deg+'deg)';
-					this.$['wac-knob'].style.msTransform = 'rotate('+deg+'deg)';
 					this.$['wac-knob'].style.transform = 'rotate('+deg+'deg)';
 				}
 			}
@@ -523,20 +525,22 @@
 				this.showtip();
 				e.preventDefault();
 			},
-			setValue: function(value) {
+			setValue: function(value,fire) {
 				value = parseFloat(value);
 				if(!isNaN(value)) {
 					this.value = value < this.min ? this.min : value > this.max ? this.max : value;
-					var range = Math.abs(this.min) + Math.abs(this.max);
+					var range = this.max - this.min;
 					if(this.direction == 'vert') {
-						var value = this.ditchLength+(this.height-this.ditchLength)/2 - this.value * (this.ditchLength/this.max);
-						this.$['wac-sliknob'].style.top = value-this.knobheight/2 + "px";
+						var pos = (this.height + this.ditchLength - this.knobheight)*0.5 - (this.value -this.min) / range * this.ditchLength;
+						this.$['wac-sliknob'].style.top = pos + "px";
 					}
 					else {
-						var value = (this.width-this.ditchLength)/2 + this.value * (this.ditchLength/this.max);
-						this.$['wac-sliknob'].style.left = value-this.knobwidth/2+"px";
+						var pos = (this.width - this.ditchLength - this.knobwidth)*0.5  + (this.value - this.min) / range * this.ditchLength;
+						this.$['wac-sliknob'].style.left = pos+"px";
 					}
 					this.valuedisp = this.value.toFixed(this.digits);
+					if(fire)
+						this.fire('change');
 					if(this.value!=this.valueold) {
 						this.valueold=this.value;
 						return 1;
@@ -713,7 +717,7 @@
 				e.stopPropagation();
 				return false;
 			},
-			setValue: function(value) {
+			setValue: function(value,fire) {
 				this.value = parseInt(value);
 				this.valuedisp = this.value;
 				this.$['wac-switch'].style.backgroundPosition = '0px -' + (this.value * this.height) + 'px';
@@ -724,6 +728,8 @@
 							el[i].setValue(0);
 					}
 				}
+				if(fire)
+					this.fire('change');
 				if(this.value!=this.valueold) {
 					this.valueold = this.value;
 					return 1;
@@ -869,6 +875,7 @@
 			bwidth:		0,
 			wwidth:		0,
 			press:		0,
+			hover:		0,
 			keyenable:	1,
 			colors:		'#222;#eee;#ccc;#333;#000;#e88;#c44;#c33;#800',
 			enable:		1,
@@ -886,7 +893,7 @@
 				var v=[];
 				if(e.touches)
 					var p=e.touches;
-				else if(this.press)
+				else if(this.press && this.hover)
 					var p=[e];
 				else
 					return;
@@ -924,16 +931,12 @@
 			pointerover: function(e) {
 				if(!this.enable)
 					return;
-				if(typeof(e.buttons)!="undefined")
-					var btn = e.buttons;
-				else
-					var btn = e.which;
-				this.press = btn?1:0;
+				this.hover = 1;
 			},
 			pointerout: function(e) {
 				if(!this.enable)
 					return;
-				this.press = 0;
+				this.hover = 0;
 				this.values=[];
 				this.sendevent();
 				this.redraw();
