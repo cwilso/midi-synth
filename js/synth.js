@@ -759,36 +759,6 @@ function pointerUp( ev ) {
 	ev.preventDefault();
 }
 
-function pointerOver( ev ) {
-	var note = parseInt( ev.target.id.substring( 1 ) );
-	if (pointerDebugging)
-		console.log( "pointerover: id: " + ev.pointerId + " note:" + note );
-	ev.preventDefault();
-}
-function pointerOut( ev ) {
-	var note = parseInt( ev.target.id.substring( 1 ) );
-	if (pointerDebugging)
-		console.log( "pointerout: id: " + ev.pointerId + " note:" + note );
-	ev.preventDefault();
-}
-function pointerEnter( ev ) {
-	var note = parseInt( ev.target.id.substring( 1 ) );
-	if (pointerDebugging)
-		console.log( "pointerenter: id: " + ev.pointerId + " note:" + note );
-	ev.preventDefault();
-}
-function pointerLeave( ev ) {
-	var note = parseInt( ev.target.id.substring( 1 ) );
-	if (pointerDebugging)
-		console.log( "pointerleave: id: " + ev.pointerId + " note:" + note );
-	ev.preventDefault();
-}
-function pointerCancel( ev ) {
-	var note = parseInt( ev.target.id.substring( 1 ) );
-	if (pointerDebugging)
-		console.log( "pointercancel: id: " + ev.pointerId + " note:" + note );
-	ev.preventDefault();
-}
 
 function onChangeOctave( ev ) {
 	currentOctave = ev.target.selectedIndex;

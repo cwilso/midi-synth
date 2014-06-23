@@ -158,14 +158,10 @@ function setupSynthUI() {
 		keybox.addEventListener('touchmove', touchmove);
 		keybox.addEventListener('touchend', touchend);
 	} else {
-		keybox.addEventListener('pointerdown', pointerDown);
-		keybox.addEventListener('pointermove', pointerMove);
-		keybox.addEventListener('pointerup', pointerUp);
-		keybox.addEventListener('pointerover', pointerOver);
-		keybox.addEventListener('pointerout', pointerOut);
-		keybox.addEventListener('pointerenter', pointerEnter);
-		keybox.addEventListener('pointerleave', pointerLeave);
-		keybox.addEventListener('pointercancel', pointerCancel);
+		keybox.addEventListener('down', pointerDown);
+		keybox.addEventListener('track', pointerMove);
+		keybox.addEventListener('up', pointerUp);
+
 		if (window.location.search.substring(1) == "dbgptr")
 			pointerDebugging = true;
 	}
