@@ -30,13 +30,14 @@ function selectMIDIIn( ev ) {
 }
 
 function onMIDIStarted( midi ) {
-  var preferredIndex = -1;
+  var preferredIndex = 0;
 
   midiAccess = midi;
 
   document.getElementById("synthbox").className = "loaded";
 
   selectMIDI=document.getElementById("midiIn");
+  if ((typeof(midiAccess.inputs) == "function")) {  //Old Skool MIDI inputs() code
   var list=midiAccess.inputs();
 
   // clear the MIDI input select
@@ -47,8 +48,6 @@ function onMIDIStarted( midi ) {
     if ((str.indexOf("Keyboard") != -1)||(str.indexOf("keyboard") != -1)||(str.indexOf("KEYBOARD") != -1))
       preferredIndex=i;
   }
-  if (preferredIndex==-1)
-    preferredIndex=0;
 
   if (list.length) {
     for (var i=0; i<list.length; i++) {
@@ -58,6 +57,28 @@ function onMIDIStarted( midi ) {
     midiIn.onmidimessage = midiMessageReceived;
 
     selectMIDI.onchange = selectMIDIIn;
+  }
+  } else {
+  // clear the MIDI input select
+  selectMIDI.options.length = 0;
+
+  // Check to see if any of the devices have "Keyboard" in the name
+  var i=0;
+  for (var input of midiAccess.inputs.values()) {
+    var str=input.name.toString();
+    if (!preferredIndex && ((str.indexOf("Keyboard") != -1)||(str.indexOf("keyboard") != -1)||(str.indexOf("KEYBOARD") != -1)))
+      preferredIndex=i;
+    i++;
+  }
+
+  i=0;
+  for (var input of midiAccess.inputs.values()) {
+    selectMIDI.appendChild(new Option(input.name,input.fingerprint,i==preferredIndex,i==preferredIndex));
+    i++;
+    midiIn = input;
+    midiIn.onmidimessage = midiMessageReceived;
+    selectMIDI.onchange = selectMIDIIn;
+  }
   }
 }
 
