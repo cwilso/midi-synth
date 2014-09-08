@@ -25,11 +25,11 @@
 -->
 
 
-<polymer-element name="webaudio-knob" attributes="value defvalue min max step sprites diameter width height sensitivity src valuetip tooltip enable" on-mousedown="pointerdown" on-touchstart="pointerdown">
+<polymer-element name="webaudio-knob" attributes="value units log defvalue min max step sprites diameter width height sensitivity src valuetip tooltip enable" on-mousedown="pointerdown" on-touchstart="pointerdown">
 	<template>
 		<div class="wac-body" id="wac-body" touch-action="none">
 			<div id="wac-knob" touch-action="none"></div>
-			<span id="wac-value-tip">{{valuedisp}}</span>
+			<span id="wac-value-tip">{{valuedisp}}{{units}}</span>
 			<div id="wac-tooltip-box"><span id="wac-tooltip-text">{{tooltip}}</span></div>
 		</div>
 		<style>
@@ -85,6 +85,10 @@
 		</style>
 	</template>
 	<script>
+		function log2(num) {
+			var log=Math.log(num) / Math.LN2;
+			return log;
+		}
 		Polymer('webaudio-knob', (function() {
 			var pointermove = function(e) {
 				if(e.touches)
@@ -96,7 +100,7 @@
 					this.startVal = this.value;
 				}
 				var offset = (this.startPosY - e.pageY - this.startPosX + e.pageX) * this.sensitivity;
-				if(this.setValue(this.min + ((((this.startVal + (this.max - this.min) * offset / ((e.shiftKey ? 4:1) * 128)) - this.min) / this.step)|0) * this.step))
+				if(this.setValue(this.min + ((((this.startVal + (this.max - this.min) * offset / ((e.shiftKey ? 4:1) * 128)) - this.min) / this.ctlStep)|0) * this.ctlStep))
 					this.fire('change');
 				e.preventDefault();
 			};
@@ -131,26 +135,42 @@
 					knb.style.background = 'url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAACg0lEQVR42u2bvW7CMBCAwwswMCB14AUQb8BjsHbKUqljngClW16gUxkYeQXmTrRTXqEjTCiiGYJ7iS5SlAZIgu98wbH0CWTxc3ex785n23Ho2wRYAD6wAXbADxABCRJh3w4/4+N3Jk5H2xwIgBBQdxLib82lKz0EPE1KXzOGh/8lSnEfh3FtZcbAMzJubogI/9O4IV6BQ9MnOQW+gWgwyPgCpu1GxAFlYG8zYNt2KL+Bwkd4PSNH7LtjamxRJpbmouduLfAKiAGFxNh3p39IUDbSFuhwZkQGyAmolF/r8uapsr8w5HMDpO9XeqPFWrfyG53h7AMUjgs+IMY+zSFzI+7JV02Bs/4poHUkBARCUfsAbT7BpcroilNA0U2BIm6bOJ9QCVSeAgROsCpENsoTtoTCZE+7HAWIR0CeLNVObxW1ARiiQBU30+Zhm9xecBSoWjtcXUD5DEKod+BUGAEn7HN48K89/YhDiBdgXwiDe+xjMkB0aRR4TAKoJ2AJfCJL7HP48KoMEDIKoEbADBnxKp9Xlv7V8JRlzMlTXuEExoa/EMJi3V5ZSrbvsLDYAAu25EcovvZqT8fIqkY7iw2Q6p5tStpqgFR3nvxfKKnudJWfDpD0BuinQO8E+zBofSJkfSps/WLI+uWw9QWRviTWF0Xtmwah0Y0RAXhGt8YE5P9Do5ujEpIfo9vjBrm5Pc5yQMIgtc8Vbx9Q+dpHZMgPSRmq/DQ+TO0+kAFaH6IOHi3lFXFUlhFth6a7WDXSdli6iyNB+3H5LvkEsgsTxeiQCA115FdminmCpGSJ9dJUOW02uXYwdm2uvIBqfHFSw5JWxMXJsiGsvDpb1ay8PH2pib4+/wcnUdJ/bu6siQAAAABJRU5ErkJggg==)';
 					this.sprites = 0;
 				}
-//				this.$['wac-body'].style.width = this.width+'px';
 				knb.style.backgroundSize = '100% '+((this.sprites+1)*100)+'%';
 				if(this.step && this.step < 1) {
 					for(var n = this.step ; n < 1; n *= 10)
 						++this.digits;
 				}
-				this.setValue(this.value);
+				this.minval = this.min;
+				this.maxval = this.max;
+				if (this.log) {
+					if (this.minval == 0)
+						this.minval = 0.001;
+					this.min = log2(this.minval);
+					this.max = log2(this.maxval);
+					this.setValue(log2(this.value));
+					this.ctlStep = log2(this.step);
+					if (this.ctlStep == 0)
+						this.ctlStep = 0.0001;
+				} else
+					this.setValue(this.value);
 				this.fire('change');
 			},
 			value:      0,
+			units:      "", 
+			log:        false,
 			valueold:	NaN,
 			valuedisp:	"0",
 			defvalue:   null,
 			offset:     0,
 			min:        0,
+			minval:     0,
 			max:        100,
+			maxval:     100,
 			diameter:   64,
 			width:      null,
 			height:     null,
 			step:       1,
+			ctlStep:    1,
 			digits:     0,
 			sprites:    0,
 			enable:		1,
@@ -252,11 +272,21 @@
 				value = parseFloat(value);
 				if(!isNaN(value)) {
 					this.value = value < this.min ? this.min : value > this.max ? this.max : value;
-					this.valuedisp = this.value.toFixed(this.digits);
+					var valueNumber = (this.log) ? Math.pow(2,this.value) : this.value;
+					this.valuedisp = valueNumber.toFixed(this.digits);
+					if ((this.digits==0)&&(valueNumber>1000)) {
+						valueNumber = valueNumber/1000;
+						// between 1k and 10k - show two digits, else show one
+						this.valuedisp = valueNumber.toFixed((valueNumber<10)?2:1) + "k";
+					} 
 				}
 				if(fire)
 					this.fire('change');
-				if(this.value!=this.valueold) {
+/*				if (this.log)
+					console.log("value: " + this.value + " valuedisp: " +
+						this.valuedisp + " min: " + this.min + " minval: " +
+						this.minval + " max: " + this.max + " maxval: " + this.maxval );
+*/				if(this.value!=this.valueold) {
 					this.redraw();
 					this.valueold = this.value;
 					return 1;
@@ -281,13 +311,13 @@
 </polymer-element>
 
 
-<polymer-element name="webaudio-slider" attributes="min max value defvalue step width height knobwidth knobheight ditchLength src knobsrc direction valuetip sensitivity tooltip enable" on-mousedown="pointerdown" on-touchstart="pointerdown">
+<polymer-element name="webaudio-slider" attributes="min max value units defvalue step width height knobwidth knobheight ditchLength src knobsrc direction valuetip sensitivity tooltip enable" on-mousedown="pointerdown" on-touchstart="pointerdown">
 	<template>
 		<div class="wac-body" id="wac-body">
 			<div id="wac-slibase" touch-action="none">
 				<div id="wac-sliknob"></div>
 			</div>
-			<span id="wac-value-tip">{{valuedisp}}</span>
+			<span id="wac-value-tip">{{valuedisp}}{{units}}</span>
 			<div id="wac-tooltip-box"><span id="wac-tooltip-text">{{tooltip}}</span></div>
 		</div>
 		<style>
@@ -418,6 +448,7 @@
 			min:			0,
 			max:			100,
 			value:			0,
+			units:          "",
 			valueold:		0,
 			valuedisp:		"0",
 			defvalue:		null,

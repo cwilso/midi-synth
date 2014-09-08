@@ -18,7 +18,7 @@ var currentOsc2Octave = 0;  // 16'
 var currentOsc2Detune = -25;	// fat detune makes pretty analogue-y sound.  :)
 var currentOsc2Mix = 50.0;	// 0%
 
-var currentFilterCutoff = 19.0;
+var currentFilterCutoff = 5000;
 var currentFilterQ = 7.0;
 var currentFilterMod = 21;
 var currentFilterEnv = 56;
@@ -212,6 +212,12 @@ function pitchWheel( value ) {
 			if (voices[i].osc2)
 				voices[i].osc2.detune.value = currentOsc2Detune + currentPitchWheel * 500;	// value in cents - detune major fifth.
 		}
+	}
+}
+
+function polyPressure( noteNumber, value ) {
+	if (voices[noteNumber] != null) {
+		voices[noteNumber].setFilterQ( value*20 );
 	}
 }
 

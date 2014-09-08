@@ -5,7 +5,7 @@ function testChange(e) {
 	console.log("test");
 }
 
-function createKnob( id, label, width, x, y, min, max, currentValue, color, onChange ) {
+function createKnob( id, label, width, x, y, min, max, currentValue, color, onChange, units, log ) {
 	var container = document.createElement( "div" );
 	container.className = "knobContainer";
 	container.style.left = "" + x + "px";
@@ -33,7 +33,12 @@ function createKnob( id, label, width, x, y, min, max, currentValue, color, onCh
 	knob.setAttribute( "src", "img/LittlePhatty.png" );
 	knob.setAttribute( "min", ""+min );
 	knob.setAttribute( "max", ""+max );
-	knob.setAttribute( "step", (max-min)/100 );
+	if (log)
+		knob.setAttribute( "log", true );
+	else
+		knob.setAttribute( "step", (max-min)/100 );
+	if (units)
+		knob.setAttribute("units", units);
 	knob.setAttribute( "diameter", "64" );
 	knob.setAttribute( "sprites", "100" );
 	knob.setAttribute( "tooltip", label );
@@ -123,7 +128,7 @@ function setupSynthUI() {
 	synthBox.appendChild( osc2 );
 
 	var filter = createSection( "filter", 387, 10, 80, 342 );	
-	filter.appendChild( createKnob( "fFreq", "cutoff", 75, 12, 15, 0, 100, currentFilterCutoff, "#ffaa00", onUpdateFilterCutoff ) );
+	filter.appendChild( createKnob( "fFreq", "cutoff", 75, 12, 15, 20, 20000, currentFilterCutoff, "#ffaa00", onUpdateFilterCutoff, "Hz", true ) );
 	filter.appendChild( createKnob( "fQ", "q",       75, 12, 100, 0, 20, currentFilterQ, "#ffaa00", onUpdateFilterQ ) );
 	filter.appendChild( createKnob( "fMod", "mod",   75, 12, 185, 0, 100, currentFilterMod, "#ffaa00", onUpdateFilterMod ) );
 	filter.appendChild( createKnob( "fEnv", "env",   75, 12, 270, 0, 100, currentFilterEnv, "#ffaa00", onUpdateFilterEnv ) );
