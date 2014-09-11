@@ -28,8 +28,17 @@ var midiAccess = null;
 var midiIn = null;
 
 function selectMIDIIn( ev ) {
-  midiIn = midiAccess.inputs()[selectMIDI.selectedIndex];
-  midiIn.onmidimessage = midiMessageReceived;
+  if (midiIn)
+    midiIn.onmidimessage = null;
+  var selectedID = ev.target[ev.target.selectedIndex].value;
+
+  for (var input of midiAccess.inputs.values()) {
+    if (selectedID == input.id) {
+      midiIn = input;
+      midiIn.onmidimessage = midiMessageReceived;
+      return;
+    }
+  }
 }
 
 function onMIDIStarted( midi ) {
@@ -41,47 +50,49 @@ function onMIDIStarted( midi ) {
 
   selectMIDI=document.getElementById("midiIn");
   if ((typeof(midiAccess.inputs) == "function")) {  //Old Skool MIDI inputs() code
-  var list=midiAccess.inputs();
+    var list=midiAccess.inputs();
 
-  // clear the MIDI input select
-  selectMIDI.options.length = 0;
+    // clear the MIDI input select
+    selectMIDI.options.length = 0;
 
-  for (var i=0; (i<list.length)&&(preferredIndex==-1); i++) {
-    var str=list[i].name.toString();
-    if ((str.indexOf("Keyboard") != -1)||(str.indexOf("keyboard") != -1)||(str.indexOf("KEYBOARD") != -1))
-      preferredIndex=i;
-  }
-
-  if (list.length) {
-    for (var i=0; i<list.length; i++) {
-      selectMIDI.appendChild(new Option(list[i].name,list[i].fingerprint,i==preferredIndex,i==preferredIndex));
+    for (var i=0; (i<list.length)&&(preferredIndex==-1); i++) {
+      var str=list[i].name.toString();
+      if ((str.indexOf("Keyboard") != -1)||(str.indexOf("keyboard") != -1)||(str.indexOf("KEYBOARD") != -1))
+        preferredIndex=i;
     }
-    midiIn = list[preferredIndex];
-    midiIn.onmidimessage = midiMessageReceived;
 
-    selectMIDI.onchange = selectMIDIIn;
-  }
-  } else {
-  // clear the MIDI input select
-  selectMIDI.options.length = 0;
+    if (list.length) {
+      for (var i=0; i<list.length; i++) {
+        selectMIDI.appendChild(new Option(list[i].name,list[i].fingerprint,i==preferredIndex,i==preferredIndex));
+      }
+      midiIn = list[preferredIndex];
+      midiIn.onmidimessage = midiMessageReceived;
 
-  // Check to see if any of the devices have "Keyboard" in the name
-  var i=0;
-  for (var input of midiAccess.inputs.values()) {
-    var str=input.name.toString();
-    if (!preferredIndex && ((str.indexOf("Keyboard") != -1)||(str.indexOf("keyboard") != -1)||(str.indexOf("KEYBOARD") != -1)))
-      preferredIndex=i;
-    i++;
-  }
+      selectMIDI.onchange = selectMIDIIn;
+    }
+  } else {  // new MIDIMap implementation:
 
-  i=0;
-  for (var input of midiAccess.inputs.values()) {
-    selectMIDI.appendChild(new Option(input.name,input.fingerprint,i==preferredIndex,i==preferredIndex));
-    i++;
-    midiIn = input;
-    midiIn.onmidimessage = midiMessageReceived;
-    selectMIDI.onchange = selectMIDIIn;
-  }
+
+    // clear the MIDI input select
+    selectMIDI.options.length = 0;
+
+    // Check to see if any of the devices have "Keyboard" in the name
+    var i=0;
+    for (var input of midiAccess.inputs.values()) {
+      var str=input.name.toString();
+      if (!preferredIndex && ((str.indexOf("Keyboard") != -1)||(str.indexOf("keyboard") != -1)||(str.indexOf("KEYBOARD") != -1)))
+        preferredIndex=i;
+      i++;
+    }
+
+    i=0;
+    for (var input of midiAccess.inputs.values()) {
+      selectMIDI.appendChild(new Option(input.name,input.fingerprint,i==preferredIndex,i==preferredIndex));
+      i++;
+      midiIn = input;
+      midiIn.onmidimessage = midiMessageReceived;
+      selectMIDI.onchange = selectMIDIIn;
+    }
   }
 }
 
