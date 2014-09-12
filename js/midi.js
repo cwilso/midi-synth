@@ -86,7 +86,7 @@ function onMIDIStarted( midi ) {
     }
 */
     inputs=midiAccess.inputs.values();
-    for ( var input = inputs.next(); input; input = inputs.next()) {
+    for ( var input = inputs.next(); input && !input.done; input = inputs.next()){
       input = input.value;
       var str=input.name.toString();
       var preferred = !midiIn && ((str.indexOf("MPK") != -1)||(str.indexOf("Keyboard") != -1)||(str.indexOf("keyboard") != -1)||(str.indexOf("KEYBOARD") != -1));
