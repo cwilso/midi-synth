@@ -113,6 +113,7 @@ var volNode = null;
 var revNode = null;
 var revGain = null;
 var revBypassGain = null;
+var compressor = null;
 
 function frequencyFromNoteNumber( note ) {
 	return 440 * Math.pow(2,(note-69)/12);
@@ -147,12 +148,12 @@ function $(id) {
 // 'value' is normalized to 0..1.
 function controller( number, value ) {
 	switch(number) {
-	case 7:
-		$("fFreq").setValue(100*value);
+	case 2:
+		$("fFreq").setRatioValue(value);
 		onUpdateFilterCutoff( 100*value );
 		return;
 	case 0x0a:
-	case 2:
+	case 7:
 		$("fQ").setValue(20*value);
 		onUpdateFilterQ( 20*value );
 		return;
@@ -162,11 +163,13 @@ function controller( number, value ) {
 		return;
 	case 0x49:
 	case 5:
+	case 15:
 	    $("drive").setValue(100 * value);
 	    onUpdateDrive( 100 * value );
 	    return;
 	case 0x48:
 	case 6:
+	case 16:
 	    $("reverb").setValue(100 * value);
 	    onUpdateReverb( 100 * value );
 	    return;
@@ -179,6 +182,7 @@ function controller( number, value ) {
 	    onUpdateModOsc2( 100 * value );
 	    return;
 	case 4:
+	case 17:
 	    $("mFreq").setValue(10 * value);
 	    onUpdateModFrequency( 10 * value );
 	    return;
@@ -599,6 +603,7 @@ Voice.prototype.updateOsc2Mix = function( value ) {
 Voice.prototype.setFilterCutoff = function( value ) {
 	var now =  audioContext.currentTime;
 	var filterFrequency = filterFrequencyFromCutoff( this.originalFrequency, value/100 );
+//	console.log("Filter cutoff: orig:" + this.originalFrequency + " value:" + value + " newFreq:" +filterFrequency );
 	this.filter1.frequency.cancelScheduledValues( now );
 	this.filter1.frequency.setValueAtTime( filterFrequency, now );
 	this.filter2.frequency.cancelScheduledValues( now );
@@ -801,6 +806,7 @@ function initAudio() {
 
     volNode = audioContext.createGain();
     volNode.gain.value = currentVol;
+    compressor = audioContext.createDynamicsCompressor();
     waveshaper.output.connect( revNode );
     waveshaper.output.connect( revBypassGain );
     revNode.connect( revGain );
@@ -808,7 +814,8 @@ function initAudio() {
     revBypassGain.connect( volNode );
     onUpdateReverb( {currentTarget:{value:currentRev}} );
 
-    volNode.connect( audioContext.destination );
+    volNode.connect( compressor );
+    compressor.connect(	audioContext.destination );
     onUpdateVolume( {currentTarget:{value:currentVol}} );
 
     if (!isMobile) {
