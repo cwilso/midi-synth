@@ -120,6 +120,7 @@ function frequencyFromNoteNumber( note ) {
 }
 
 function noteOn( note, velocity ) {
+	console.log("note on: " + note );
 	if (voices[note] == null) {
 		// Create a new synth node
 		voices[note] = new Voice(note, velocity);
@@ -501,10 +502,10 @@ function Voice( note, velocity ) {
 
 	// create the LP filter
 	this.filter1 = audioContext.createBiquadFilter();
-	this.filter1.type = this.filter1.LOWPASS;
+	this.filter1.type = "lowpass";
 	this.filter1.Q.value = currentFilterQ;
 	this.filter2 = audioContext.createBiquadFilter();
-	this.filter2.type = this.filter2.LOWPASS;
+	this.filter2.type = "lowpass";
 	this.filter2.Q.value = currentFilterQ;
 
 	this.osc1Gain.connect( this.filter1 );
