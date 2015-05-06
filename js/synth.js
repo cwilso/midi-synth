@@ -18,7 +18,7 @@ var currentOsc2Octave = 0;  // 16'
 var currentOsc2Detune = -25;	// fat detune makes pretty analogue-y sound.  :)
 var currentOsc2Mix = 50.0;	// 0%
 
-var currentFilterCutoff = 5000;
+var currentFilterCutoff = 8;
 var currentFilterQ = 7.0;
 var currentFilterMod = 21;
 var currentFilterEnv = 56;
@@ -270,6 +270,7 @@ function onUpdateModOsc2( ev ) {
 
 function onUpdateFilterCutoff( ev ) {
 	var value = ev.currentTarget ? ev.currentTarget.value : ev;
+//	console.log( "currentFilterCutoff= " + currentFilterCutoff + "new cutoff= " + value );
 	currentFilterCutoff = value;
 	for (var i=0; i<255; i++) {
 		if (voices[i] != null) {
@@ -434,7 +435,7 @@ function onUpdateReverb( ev ) {
 }
 
 /*
-var FOURIER_SIZE = 4096;
+var FOURIER_SIZE = 2048;
 var wave = false;
 
 	if ( wave ) {
@@ -457,6 +458,7 @@ var wave = false;
 function filterFrequencyFromCutoff( pitch, cutoff ) {
     var nyquist = 0.5 * audioContext.sampleRate;
 
+//    var filterFrequency = Math.pow(2, (9 * cutoff) - 1) * pitch;
     var filterFrequency = Math.pow(2, (9 * cutoff) - 1) * pitch;
     if (filterFrequency > nyquist)
         filterFrequency = nyquist;
@@ -504,9 +506,13 @@ function Voice( note, velocity ) {
 	this.filter1 = audioContext.createBiquadFilter();
 	this.filter1.type = "lowpass";
 	this.filter1.Q.value = currentFilterQ;
+	this.filter1.frequency.value = Math.pow(2, currentFilterCutoff); 
+	// filterFrequencyFromCutoff( this.originalFrequency, currentFilterCutoff );
+//	console.log( "filter frequency: " + this.filter1.frequency.value);
 	this.filter2 = audioContext.createBiquadFilter();
 	this.filter2.type = "lowpass";
 	this.filter2.Q.value = currentFilterQ;
+	this.filter2.frequency.value = Math.pow(2, currentFilterCutoff); 
 
 	this.osc1Gain.connect( this.filter1 );
 	this.osc2Gain.connect( this.filter1 );
@@ -516,6 +522,7 @@ function Voice( note, velocity ) {
 	this.modFilterGain = audioContext.createGain();
 	this.modOsc.connect( this.modFilterGain );
 	this.modFilterGain.gain.value = currentFilterMod*24;
+//	console.log("modFilterGain=" + currentFilterMod*24);
 	this.modFilterGain.connect( this.filter1.detune );	// filter tremolo
 	this.modFilterGain.connect( this.filter2.detune );	// filter tremolo
 
@@ -533,25 +540,22 @@ function Voice( note, velocity ) {
 	this.envelope.gain.linearRampToValueAtTime( 1.0, envAttackEnd );
 	this.envelope.gain.setTargetAtTime( (currentEnvS/100.0), envAttackEnd, (currentEnvD/100.0)+0.001 );
 
-    var pitchFrequency = this.originalFrequency;
-    var filterInitLevel = filterFrequencyFromCutoff( pitchFrequency, currentFilterCutoff/100 );
-	var filterAttackLevel = filterFrequencyFromCutoff( pitchFrequency, currentFilterCutoff/100 + 
-		(currentFilterEnv/120) );
-	var filterSustainLevel = filterFrequencyFromCutoff( pitchFrequency, currentFilterCutoff/100 + 
-		((currentFilterEnv/120) * (currentFilterEnvS/100.0)) );
-	var filterAttackEnd = now + (currentFilterEnvA/20.0);
+	var filterAttackLevel = currentFilterEnv*72;  // Range: 0-7200: 6-octave range
+	var filterSustainLevel = filterAttackLevel* currentFilterEnvS / 100.0; // range: 0-7200
+	var filterAttackEnd = (currentFilterEnvA/20.0);
 
-/*
-	console.log( "pitchFrequency: " + pitchFrequency + " filterInitLevel: " + filterInitLevel + 
-				 " filterAttackLevel: " + filterAttackLevel + " filterSustainLevel: " + filterSustainLevel );
-*/	this.filter1.frequency.value = filterInitLevel;
-	this.filter1.frequency.setValueAtTime( filterInitLevel, now );
-	this.filter1.frequency.linearRampToValueAtTime( filterAttackLevel, filterAttackEnd );
-	this.filter1.frequency.setTargetAtTime( filterSustainLevel, filterAttackEnd, (currentFilterEnvD/100.0) );
-	this.filter2.frequency.value = filterInitLevel;
-	this.filter2.frequency.setValueAtTime( filterInitLevel, now );
-	this.filter2.frequency.linearRampToValueAtTime( filterAttackLevel, filterAttackEnd );
-	this.filter2.frequency.setTargetAtTime( filterSustainLevel, filterAttackEnd, (currentFilterEnvD/100.0) );
+/*	console.log( "filterAttackLevel: " + filterAttackLevel + 
+				 " filterSustainLevel: " + filterSustainLevel +
+				 " filterAttackEnd: " + filterAttackEnd);
+*/
+	if (!filterAttackEnd) 
+				filterAttackEnd=0.05; // tweak to get target decay to work properly
+	this.filter1.detune.setValueAtTime( 0, now );
+	this.filter1.detune.linearRampToValueAtTime( filterAttackLevel, now+filterAttackEnd );
+	this.filter2.detune.setValueAtTime( 0, now );
+	this.filter2.detune.linearRampToValueAtTime( filterAttackLevel, now+filterAttackEnd );
+	this.filter1.detune.setTargetAtTime( filterSustainLevel, now+filterAttackEnd, (currentFilterEnvD/100.0) );
+	this.filter2.detune.setTargetAtTime( filterSustainLevel, now+filterAttackEnd, (currentFilterEnvD/100.0) );
 
 	this.osc1.start(0);
 	this.osc2.start(0);
@@ -603,12 +607,10 @@ Voice.prototype.updateOsc2Mix = function( value ) {
 
 Voice.prototype.setFilterCutoff = function( value ) {
 	var now =  audioContext.currentTime;
-	var filterFrequency = filterFrequencyFromCutoff( this.originalFrequency, value/100 );
-//	console.log("Filter cutoff: orig:" + this.originalFrequency + " value:" + value + " newFreq:" +filterFrequency );
-	this.filter1.frequency.cancelScheduledValues( now );
-	this.filter1.frequency.setValueAtTime( filterFrequency, now );
-	this.filter2.frequency.cancelScheduledValues( now );
-	this.filter2.frequency.setValueAtTime( filterFrequency, now );
+	var filterFrequency = Math.pow(2, value);
+//	console.log("Filter cutoff: orig:" + this.filter1.frequency.value + " new:" + filterFrequency + " value: " + value );
+	this.filter1.frequency.value = filterFrequency;
+	this.filter2.frequency.value = filterFrequency;
 }
 
 Voice.prototype.setFilterQ = function( value ) {
@@ -618,6 +620,7 @@ Voice.prototype.setFilterQ = function( value ) {
 
 Voice.prototype.setFilterMod = function( value ) {
 	this.modFilterGain.gain.value = currentFilterMod*24;
+//	console.log( "filterMod.gain=" + currentFilterMod*24);
 }
 
 Voice.prototype.noteOff = function() {
@@ -629,12 +632,10 @@ Voice.prototype.noteOff = function() {
 	this.envelope.gain.cancelScheduledValues(now);
 	this.envelope.gain.setValueAtTime( this.envelope.gain.value, now );  // this is necessary because of the linear ramp
 	this.envelope.gain.setTargetAtTime(0.0, now, (currentEnvR/100));
-	this.filter1.frequency.cancelScheduledValues(now);
-	this.filter1.frequency.setValueAtTime( this.filter1.frequency.value, now );  // this is necessary because of the linear ramp
-	this.filter1.frequency.setTargetAtTime( initFilter, now, (currentFilterEnvR/100.0) );
-	this.filter2.frequency.cancelScheduledValues(now);
-	this.filter2.frequency.setValueAtTime( this.filter2.frequency.value, now );  // this is necessary because of the linear ramp
-	this.filter2.frequency.setTargetAtTime( initFilter, now, (currentFilterEnvR/100.0) );
+	this.filter1.detune.cancelScheduledValues(now);
+	this.filter1.detune.setTargetAtTime( 0, now, (currentFilterEnvR/100.0) );
+	this.filter2.detune.cancelScheduledValues(now);
+	this.filter2.detune.setTargetAtTime( 0, now, (currentFilterEnvR/100.0) );
 
 	this.osc1.stop( release );
 	this.osc2.stop( release );
