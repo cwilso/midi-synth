@@ -475,7 +475,7 @@ function Voice( note, velocity ) {
 
 	this.osc1Gain = audioContext.createGain();
 	this.osc1Gain.gain.value = 0.005 * currentOsc1Mix;
-//	this.gain.gain.value = 0.05 + (0.33 * velocity);
+//	this.osc1Gain.gain.value = 0.05 + (0.33 * velocity);
 	this.osc1.connect( this.osc1Gain );
 
 	// create osc 2
@@ -485,6 +485,7 @@ function Voice( note, velocity ) {
 
 	this.osc2Gain = audioContext.createGain();
 	this.osc2Gain.gain.value = 0.005 * currentOsc2Mix;
+//	this.osc2Gain.gain.value = 0.05 + (0.33 * velocity);
 	this.osc2.connect( this.osc2Gain );
 
 	// create modulator osc
