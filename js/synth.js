@@ -496,12 +496,12 @@ function Voice( note, velocity ) {
 	this.modOsc1Gain = audioContext.createGain();
 	this.modOsc.connect( this.modOsc1Gain );
 	this.modOsc1Gain.gain.value = currentModOsc1/10;
-	this.modOsc1Gain.connect( this.osc1.frequency );	// tremolo
+	this.modOsc1Gain.connect( this.osc1.frequency );	// vibrato
 
 	this.modOsc2Gain = audioContext.createGain();
 	this.modOsc.connect( this.modOsc2Gain );
 	this.modOsc2Gain.gain.value = currentModOsc2/10;
-	this.modOsc2Gain.connect( this.osc2.frequency );	// tremolo
+	this.modOsc2Gain.connect( this.osc2.frequency );	// vibrato
 
 	// create the LP filter
 	this.filter1 = audioContext.createBiquadFilter();
@@ -524,8 +524,8 @@ function Voice( note, velocity ) {
 	this.modOsc.connect( this.modFilterGain );
 	this.modFilterGain.gain.value = currentFilterMod*24;
 //	console.log("modFilterGain=" + currentFilterMod*24);
-	this.modFilterGain.connect( this.filter1.detune );	// filter tremolo
-	this.modFilterGain.connect( this.filter2.detune );	// filter tremolo
+	this.modFilterGain.connect( this.filter1.detune );	// filter vibrato
+	this.modFilterGain.connect( this.filter2.detune );	// filter vibrato
 
 	// create the volume envelope
 	this.envelope = audioContext.createGain();
