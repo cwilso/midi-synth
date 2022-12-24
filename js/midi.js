@@ -90,12 +90,15 @@ function onMIDIStarted( midi ) {
 
 function onMIDISystemError( err ) {
   document.getElementById("synthbox").className = "error";
-  console.log( "MIDI not initialized - error encountered:" + err.code );
+  console.log( "MIDI not initialized - error encountered: " + err + " / " + err.code );
 }
 
 //init: start up MIDI
-window.addEventListener('load', function() {   
-  if (navigator.requestMIDIAccess)
-    navigator.requestMIDIAccess().then( onMIDIStarted, onMIDISystemError );
+function onClickMIDIInitializer() {
+    if (navigator.requestMIDIAccess)
+        navigator.requestMIDIAccess().then( onMIDIStarted, onMIDISystemError );
+    // remove the listener - we only need to initialize once
+    document.removeEventListener("click", onClickMIDIInitializer);
 
-});
+}
+document.addEventListener("click", onClickMIDIInitializer);
