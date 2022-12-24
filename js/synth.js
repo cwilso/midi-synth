@@ -843,4 +843,20 @@ if('serviceWorker' in navigator) {
            .register('./service-worker.js')  
            .then(function() { console.log('Service Worker Registered'); });  
 }
-window.onload=initAudio;
+
+function prepareInit() {
+    var pressKeyToInitText = document.createElement('div');
+    pressKeyToInitText.innerHTML = '<div style="text-align: center;"><font color="red" size="7">Click to initialize Audio and MIDI</font></div>';
+
+    function onClickAudioInitializer() {
+        document.getElementById('synthbox').removeChild(pressKeyToInitText);
+        initAudio();
+        // remove the listener - we only need to initialize once
+        document.removeEventListener("click", onClickAudioInitializer);
+    }
+
+    document.addEventListener("click", onClickAudioInitializer);
+    document.getElementById('synthbox').appendChild(pressKeyToInitText);
+}
+
+window.onload=prepareInit;
